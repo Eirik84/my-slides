@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agentisk AI Lab – Graduates 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --p:  #4d1d82;
+  --p2: #2A1449;
+  --pw: #8b1d82;
+  --o:  #f07d00;
+  --r:  #cf022b;
+  --g:  #2d9e6b;
+  --bk: #1d1d1b;
+  --gr: #a8a8a7;
+  --lg: #e8e4f0;
+  --grad: linear-gradient(90deg, #4d1d82, #8b1d82 30%, #cf022b 70%, #f07d00);
+  --shadow: 0 4px 24px rgba(77,29,130,.12);
+  --shadow-lg: 0 12px 48px rgba(77,29,130,.2);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: #f0ecf8;
+  color: var(--bk);
+  overflow-x: hidden;
+}
+
+/* ── ANIMATED BG ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 10% 0%, rgba(77,29,130,.08) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 90% 100%, rgba(207,2,43,.06) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 56px 40px 80px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── HERO ── */
+.hero {
+  text-align: center;
+  margin-bottom: 56px;
+  animation: fadeUp .6s ease both;
+}
+.hero-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--p2);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 6px 20px;
+  border-radius: 100px;
+  margin-bottom: 20px;
+}
+.hero-pill::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--o);
+  display: inline-block;
+  animation: pulse 2s ease infinite;
+}
+.hero h1 {
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 700;
+  color: var(--p);
+  line-height: 1.15;
+  margin-bottom: 12px;
+  letter-spacing: -.5px;
+}
+.hero h1 span {
+  background: var(--grad);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero .sub {
+  font-size: 14px;
+  color: var(--gr);
+  font-weight: 500;
+}
+
+.divider {
+  height: 3px;
+  background: var(--grad);
+  border-radius: 99px;
+  margin: 36px 0;
+  animation: expandW .8s .3s ease both;
+  transform-origin: left;
+}
+
+/* ── SECTION LABEL ── */
+.section-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--p);
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--lg), transparent);
+}
+
+/* ── GOAL CARDS ── */
+.goals-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+.goal-card {
+  border-radius: 16px;
+  padding: 22px 24px;
+  border: 1.5px solid transparent;
+  transition: transform .2s, box-shadow .2s;
+  cursor: default;
+  position: relative;
+  overflow: hidden;
+}
+.goal-card::after {
+  content: attr(data-icon);
+  position: absolute;
+  right: 16px; top: 14px;
+  font-size: 28px;
+  opacity: .15;
+  transition: opacity .2s, transform .2s;
+}
+.goal-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+.goal-card:hover::after { opacity: .35; transform: scale(1.15); }
+.goal-card.purple { background: #ebe5f6; border-color: #c9b8e8; }
+.goal-card.orange { background: #fdf2e5; border-color: #f5c98a; }
+.goal-card.green  { background: #e6f5ee; border-color: #9fd8bc; }
+.goal-card h3 { font-size: 13px; font-weight: 700; margin-bottom: 12px; }
+.goal-card.purple h3 { color: var(--p); }
+.goal-card.orange h3 { color: #8a3d00; }
+.goal-card.green  h3 { color: #1a5e3e; }
+.goal-card ul { list-style: none; }
+.goal-card ul li {
+  font-size: 12.5px;
+  color: #444;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(0,0,0,.05);
+  display: flex; gap: 8px; align-items: center;
+  line-height: 1.4;
+}
+.goal-card ul li:last-child { border: none; }
+.goal-card ul li::before { content: '✓'; font-size: 11px; flex-shrink: 0; font-weight: 700; }
+.goal-card.purple ul li::before { color: var(--p); }
+.goal-card.orange ul li::before { color: var(--o); }
+.goal-card.green  ul li::before { color: var(--g); }
+
+/* ── OPEN NOTE ── */
+.open-note {
+  background: var(--p2);
+  color: rgba(255,255,255,.85);
+  border-radius: 14px;
+  padding: 18px 24px;
+  font-size: 13.5px;
+  margin-bottom: 52px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  line-height: 1.6;
+  position: relative;
+  overflow: hidden;
+}
+.open-note::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: var(--grad);
+}
+.open-note strong { color: #fff; }
+.open-note .note-icon { font-size: 22px; flex-shrink: 0; }
+
+/* ── PROGRESS BAR ── */
+.progress-wrap {
+  margin-bottom: 52px;
+}
+.progress-track {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px 24px;
+  box-shadow: var(--shadow);
+  border: 1.5px solid var(--lg);
+}
+.progress-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gr);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.progress-steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+.p-step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  position: relative;
+}
+.p-step-dot {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  border: 2px solid var(--lg);
+  background: #fff;
+  color: var(--gr);
+  transition: all .25s;
+  z-index: 1;
+}
+.p-step.done .p-step-dot    { background: var(--p); border-color: var(--p); color: #fff; }
+.p-step.active .p-step-dot  { background: var(--o); border-color: var(--o); color: #fff; box-shadow: 0 0 0 4px rgba(240,125,0,.2); }
+.p-step:hover .p-step-dot   { transform: scale(1.15); }
+.p-step-label { font-size: 10px; font-weight: 700; color: var(--gr); text-align: center; line-height: 1.3; }
+.p-step.done .p-step-label  { color: var(--p); }
+.p-step.active .p-step-label{ color: var(--o); }
+.p-connector {
+  flex: 1;
+  height: 3px;
+  background: var(--lg);
+  margin-top: -20px;
+  position: relative;
+}
+.p-connector.done { background: var(--p); }
+
+/* ── DAY COLUMNS ── */
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-bottom: 52px;
+  align-items: start;
+}
+
+.day-col {
+  display: flex;
+  flex-direction: column;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: transform .2s, box-shadow .25s;
+  cursor: pointer;
+}
+.day-col:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
+.day-col.open-col { opacity: .85; }
+.day-col.open-col:hover { opacity: 1; }
+
+.day-col.expanded .day-body-wrap { max-height: 2000px; }
+.day-col.expanded .expand-arrow { transform: rotate(180deg); }
+
+.day-header-bar {
+  padding: 12px 16px 10px;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+.day-header-bar::after {
+  content: '';
+  position: absolute;
+  right: -12px; top: -12px;
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.1);
+}
+.day-num { font-size: 10px; opacity: .75; font-weight: 500; font-family: 'DM Mono', monospace; }
+.day-title-row { display: flex; align-items: center; justify-content: space-between; margin-top: 2px; }
+.day-title { font-size: 13px; font-weight: 700; }
+.expand-arrow { font-size: 12px; opacity: .75; transition: transform .25s; }
+
+.bg-d1 { background: linear-gradient(135deg, #4d1d82, #6b34a8); }
+.bg-d2 { background: linear-gradient(135deg, #8b1d82, #a82ea0); }
+.bg-d3 { background: linear-gradient(135deg, #a0233a, #c42a45); }
+.bg-d4 { background: linear-gradient(135deg, #cf022b, #e5103a); }
+.bg-d5 { background: linear-gradient(135deg, #1e8c5c, #2db87a); }
+
+.day-body-wrap {
+  background: #fff;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  max-height: 2000px;
+  transition: max-height .35s ease;
+  overflow: hidden;
+}
+.day-col.open-col .day-body-wrap { background: #fafafa; }
+
+.task-block {
+  border-radius: 9px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  transition: background .15s;
+}
+.task-block h4 { font-size: 11.5px; font-weight: 700; margin-bottom: 3px; }
+.task-block p  { font-size: 11px; color: #666; line-height: 1.5; }
+
+.tb-purple { background: #f0ebf9; border-color: #ddd3f0; }
+.tb-purple h4 { color: var(--p); }
+.tb-warm   { background: #f9ebf9; border-color: #f0d3f0; }
+.tb-warm h4 { color: var(--pw); }
+.tb-orange { background: #fef5ea; border-color: #f9ddb8; }
+.tb-orange h4 { color: #8a3d00; }
+.tb-red    { background: #fdeaed; border-color: #f5c0ca; }
+.tb-red h4 { color: var(--r); }
+.tb-green  { background: #e8f5ee; border-color: #b8dfca; }
+.tb-green h4 { color: #1a5e3e; }
+.tb-grey   { background: #f5f5f7; border-color: #e5e5e7; }
+.tb-grey h4 { color: #666; }
+
+.day-footer-bar {
+  padding: 8px 12px;
+  font-size: 10.5px;
+  font-weight: 700;
+  font-family: 'DM Mono', monospace;
+  border-top: 1px solid rgba(0,0,0,.06);
+  margin: 2px -10px -10px;
+  padding: 8px 14px;
+}
+.ft-purple { background: #f0ebf9; color: var(--p); }
+.ft-warm   { background: #f9ebf9; color: var(--pw); }
+.ft-red    { background: #fdeaed; color: var(--r); }
+.ft-orange { background: #fef5ea; color: #8a3d00; }
+.ft-green  { background: #e8f5ee; color: #1a5e3e; }
+
+/* ── TECH STACK FLOW ── */
+.flow-wrap {
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px 32px;
+  box-shadow: var(--shadow);
+  border: 1.5px solid var(--lg);
+  margin-bottom: 0;
+}
+.flow-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0;
+}
+.flow-node {
+  flex: 1;
+  border-radius: 12px;
+  padding: 16px 10px;
+  text-align: center;
+  border: 1.5px solid transparent;
+  transition: transform .2s, box-shadow .2s;
+  cursor: default;
+}
+.flow-node:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,.1); }
+.fn-p { background: #f0ebf9; border-color: #c9b8e8; }
+.fn-o { background: #fef5ea; border-color: #f9ddb8; }
+.fn-b { background: #e8f1fd; border-color: #b8cef5; }
+.fn-r { background: #fdeaed; border-color: #f5c0ca; }
+.fn-g { background: #e8f5ee; border-color: #9fd8bc; }
+.flow-icon  { font-size: 24px; margin-bottom: 6px; }
+.flow-name  { font-size: 12px; font-weight: 700; margin-bottom: 2px; }
+.fn-p .flow-name { color: var(--p); }
+.fn-o .flow-name { color: #8a3d00; }
+.fn-b .flow-name { color: #1565c0; }
+.fn-r .flow-name { color: var(--r); }
+.fn-g .flow-name { color: #1a5e3e; }
+.flow-sub { font-size: 10px; color: var(--gr); line-height: 1.4; }
+.flow-arrow {
+  padding: 0 4px;
+  flex-shrink: 0;
+  font-size: 18px;
+  color: #ccc;
+  animation: arrowPulse 2s ease infinite;
+}
+.flow-arrow:nth-child(2) { animation-delay: .2s; }
+.flow-arrow:nth-child(4) { animation-delay: .4s; }
+.flow-arrow:nth-child(6) { animation-delay: .6s; }
+.flow-arrow:nth-child(8) { animation-delay: .8s; }
+
+/* ── CHECKLIST SECTION ── */
+.checklist-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 36px;
+}
+.checklist-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 20px 22px;
+  box-shadow: var(--shadow);
+  border: 1.5px solid var(--lg);
+}
+.checklist-card h3 {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--lg);
+}
+.checklist-card.red h3   { color: var(--r); border-color: #f5c0ca; }
+.checklist-card.blue h3  { color: #1565c0; border-color: #b8cef5; }
+.check-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 7px 0;
+  border-bottom: 1px solid #f5f3fa;
+  font-size: 12.5px; color: #444;
+  line-height: 1.4;
+}
+.check-item:last-child { border: none; }
+.check-badge {
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 100px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  font-family: 'DM Mono', monospace;
+}
+.cb-must { background: #fdeaed; color: var(--r); }
+.cb-bor  { background: #fef5ea; color: #8a3d00; }
+.cb-can  { background: #e8f5ee; color: #1a5e3e; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes expandW {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: .4; transform: scale(.7); }
+}
+@keyframes arrowPulse {
+  0%, 100% { color: #ccc; }
+  50%       { color: #bbb; transform: translateX(2px); }
+}
+
+.anim-in {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity .5s ease, transform .5s ease;
+}
+.anim-in.visible {
+  opacity: 1;
+  transform: none;
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-pill">Sopra Steria · Graduates 2026</div>
+    <h1>Agentisk AI Lab —<br><span>Multica + Azure + Terraform</span></h1>
+    <div class="sub">Oppstart 31. august 2026 &nbsp;·&nbsp; Instruktører: Awar Vika &amp; Marius Vika</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- LÆRINGSMÅL -->
+  <div class="section-label anim-in">Læringsmål</div>
+  <div class="goals-grid anim-in">
+    <div class="goal-card purple" data-icon="☁️">
+      <h3>Azure &amp; Terraform</h3>
+      <ul>
+        <li>Sette opp Azure Container Instances</li>
+        <li>Skrive Terraform-konfig</li>
+        <li>Forstå ressurshierarki</li>
+        <li>Feilsøke mot Azure</li>
+      </ul>
+    </div>
+    <div class="goal-card orange" data-icon="🤖">
+      <h3>Agentisk arbeidsflyt</h3>
+      <ul>
+        <li>Definere agentoppgaver i Multica</li>
+        <li>Prompte effektivt</li>
+        <li>Review og styre agent-output</li>
+        <li>Bruke Claude / Claude Code</li>
+      </ul>
+    </div>
+    <div class="goal-card green" data-icon="🚀">
+      <h3>Ferdig produkt</h3>
+      <ul>
+        <li>App deployet på Azure</li>
+        <li>Skrevet av agenter</li>
+        <li>Infrastruktur som kode</li>
+        <li>Labben lever videre etter uka</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- OPEN NOTE -->
+  <div class="open-note anim-in">
+    <span class="note-icon">🔓</span>
+    <span>Dette er ikke et kurs med sluttdato. <strong>Den første uka er kickoff.</strong> Kom så langt du kommer — Azure-tilgang og Multica-workspace beholdes slik at du kan bygge videre i eget tempo.</span>
+  </div>
+
+  <!-- PROGRESS TRACKER -->
+  <div class="progress-wrap anim-in">
+    <div class="section-label" style="margin-bottom:14px">Din progresjon</div>
+    <div class="progress-track">
+      <div class="progress-title">Klikk for å markere hvor du er</div>
+      <div class="progress-steps" id="progressSteps">
+        <div class="p-step" data-step="0" onclick="setStep(0)">
+          <div class="p-step-dot">1</div>
+          <div class="p-step-label">Oppsett<br>& orientering</div>
+        </div>
+        <div class="p-connector" id="conn0"></div>
+        <div class="p-step" data-step="1" onclick="setStep(1)">
+          <div class="p-step-dot">2</div>
+          <div class="p-step-label">Agentisk<br>koding</div>
+        </div>
+        <div class="p-connector" id="conn1"></div>
+        <div class="p-step" data-step="2" onclick="setStep(2)">
+          <div class="p-step-dot">3</div>
+          <div class="p-step-label">Terraform<br>konfig</div>
+        </div>
+        <div class="p-connector" id="conn2"></div>
+        <div class="p-step" data-step="3" onclick="setStep(3)">
+          <div class="p-step-dot">4</div>
+          <div class="p-step-label">Deploy<br>til Azure</div>
+        </div>
+        <div class="p-connector" id="conn3"></div>
+        <div class="p-step" data-step="4" onclick="setStep(4)">
+          <div class="p-step-dot">🔓</div>
+          <div class="p-step-label">Demo<br>& videre</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- UKEPLAN -->
+  <div class="section-label anim-in">Ukeplan — kom så langt du kommer</div>
+  <div class="days-grid anim-in">
+
+    <div class="day-col" onclick="toggleDay(this)">
+      <div class="day-header-bar bg-d1">
+        <div class="day-num">Man 31. aug</div>
+        <div class="day-title-row">
+          <div class="day-title">DAG 1</div>
+          <div class="expand-arrow">▼</div>
+        </div>
+      </div>
+      <div class="day-body-wrap">
+        <div class="task-block tb-purple">
+          <h4>🛠 Oppsett &amp; orientering</h4>
+          <p>Multica-onboarding. Koble inn Claude via AWS Bedrock eller Foundry.</p>
+        </div>
+        <div class="task-block tb-purple">
+          <h4>📋 Mission brief</h4>
+          <p>Del opp i grupper (2–3 pers). Motta enkel app-spec fra instruktør.</p>
+        </div>
+        <div class="task-block tb-green">
+          <h4>⚡ Første agentjobb</h4>
+          <p>Generer prosjektstruktur. Kjør første prompt.</p>
+        </div>
+        <div class="day-footer-bar ft-purple">🎓 Alle online, agenten svarer</div>
+      </div>
+    </div>
+
+    <div class="day-col" onclick="toggleDay(this)">
+      <div class="day-header-bar bg-d2">
+        <div class="day-num">Tir 1. sep</div>
+        <div class="day-title-row">
+          <div class="day-title">DAG 2</div>
+          <div class="expand-arrow">▼</div>
+        </div>
+      </div>
+      <div class="day-body-wrap">
+        <div class="task-block tb-warm">
+          <h4>💻 Agentisk koding</h4>
+          <p>Agenter skriver applikasjonskode. Graduates reviewer og styrer.</p>
+        </div>
+        <div class="task-block tb-orange">
+          <h4>🐳 Dockerfile</h4>
+          <p>Agent genererer container-konfig. Bygg og test lokalt.</p>
+        </div>
+        <div class="task-block tb-purple">
+          <h4>💬 Checkpoint kl 14</h4>
+          <p>AMA-sesjon med Awar/Marius på Teams.</p>
+        </div>
+        <div class="day-footer-bar ft-warm">🎓 Docker-image fungerer lokalt</div>
+      </div>
+    </div>
+
+    <div class="day-col" onclick="toggleDay(this)">
+      <div class="day-header-bar bg-d3">
+        <div class="day-num">Ons 2. sep</div>
+        <div class="day-title-row">
+          <div class="day-title">DAG 3</div>
+          <div class="expand-arrow">▼</div>
+        </div>
+      </div>
+      <div class="day-body-wrap">
+        <div class="task-block tb-red">
+          <h4>🏗 Terraform-konfig</h4>
+          <p>Agent skriver IaC for ACI + Front Door. Graduates validerer og debugger.</p>
+        </div>
+        <div class="task-block tb-orange">
+          <h4>🔁 Agent-loop</h4>
+          <p>Iterer: agent foreslår → graduate godkjenner/justerer.</p>
+        </div>
+        <div class="task-block tb-purple">
+          <h4>🌿 Git &amp; branching</h4>
+          <p>Versjonskontroll, merge-konflikter løst med agentbistand.</p>
+        </div>
+        <div class="day-footer-bar ft-red">🎓 terraform plan uten feil</div>
+      </div>
+    </div>
+
+    <div class="day-col" onclick="toggleDay(this)">
+      <div class="day-header-bar bg-d4">
+        <div class="day-num">Tor 3. sep</div>
+        <div class="day-title-row">
+          <div class="day-title">DAG 4</div>
+          <div class="expand-arrow">▼</div>
+        </div>
+      </div>
+      <div class="day-body-wrap">
+        <div class="task-block tb-red">
+          <h4>🚀 terraform apply</h4>
+          <p>Deploy til Azure. Her går det galt – det er poenget!</p>
+        </div>
+        <div class="task-block tb-orange">
+          <h4>🔍 Feilsøking m/agent</h4>
+          <p>La Claude lese feilmeldinger og foreslå fix. Lær av feilene.</p>
+        </div>
+        <div class="task-block tb-green">
+          <h4>✅ App live på Azure</h4>
+          <p>Verifiser endpoint via Front Door. Sjekk logs.</p>
+        </div>
+        <div class="day-footer-bar ft-orange">🎓 App live på Azure ✅</div>
+      </div>
+    </div>
+
+    <div class="day-col open-col" onclick="toggleDay(this)">
+      <div class="day-header-bar bg-d5">
+        <div class="day-num">Fre 4. sep +</div>
+        <div class="day-title-row">
+          <div class="day-title">DAG 5 🔓</div>
+          <div class="expand-arrow">▼</div>
+        </div>
+      </div>
+      <div class="day-body-wrap">
+        <div class="task-block tb-green">
+          <h4>🏆 Demo</h4>
+          <p>Hver gruppe viser sin deployment live for alle.</p>
+        </div>
+        <div class="task-block tb-grey">
+          <h4>💭 Refleksjon</h4>
+          <p>Hva styrte agenter bra? Hva måtte dere overstyre?</p>
+        </div>
+        <div class="task-block tb-grey">
+          <h4>🔓 Videre</h4>
+          <p>Ingen sluttdato. Bygg videre i eget tempo. Azure-tilgang beholdes.</p>
+        </div>
+        <div class="day-footer-bar ft-green">🔓 Labben lever videre</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TEKNOLOGISTACK -->
+  <div class="section-label anim-in">Teknologistack &amp; dataflyt</div>
+  <div class="flow-wrap anim-in">
+    <div class="flow-row">
+      <div class="flow-node fn-p">
+        <div class="flow-icon">👤</div>
+        <div class="flow-name">Graduate</div>
+        <div class="flow-sub">Styrer agenter</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node fn-o">
+        <div class="flow-icon">🤝</div>
+        <div class="flow-name">Multica</div>
+        <div class="flow-sub">Human + Agent WF</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node fn-b">
+        <div class="flow-icon">🧠</div>
+        <div class="flow-name">Claude Code</div>
+        <div class="flow-sub">AWS Bedrock / Foundry</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node fn-r">
+        <div class="flow-icon">📦</div>
+        <div class="flow-name">App + IaC</div>
+        <div class="flow-sub">Kode, Docker, Terraform</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node fn-g">
+        <div class="flow-icon">☁️</div>
+        <div class="flow-name">Azure ACI</div>
+        <div class="flow-sub">+ Front Door</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECKLIST -->
+  <div class="checklist-grid anim-in">
+    <div class="checklist-card red">
+      <h3>⚠ Avklar før oppstart</h3>
+      <div class="check-item"><span class="check-badge cb-must">MÅ</span>Marius verifiserer Multica + Claude Bedrock-integrasjon</div>
+      <div class="check-item"><span class="check-badge cb-must">MÅ</span>Azure subscription provisjonert under AZ-104 — klar dag 1</div>
+      <div class="check-item"><span class="check-badge cb-must">MÅ</span>Azure-tilgang beholdes etter labuka — ikke tidsbegrenset</div>
+      <div class="check-item"><span class="check-badge cb-must">MÅ</span>Budsjettgrenser per resource group satt i Azure</div>
+      <div class="check-item"><span class="check-badge cb-bor">BØR</span>App-spec definert av instruktørene på forhånd</div>
+      <div class="check-item"><span class="check-badge cb-bor">BØR</span>Ferdig Terraform-startmal som scaffold</div>
+      <div class="check-item"><span class="check-badge cb-can">KAN</span>Fallback LLM klar hvis Bedrock gir trøbbel</div>
+    </div>
+    <div class="checklist-card blue">
+      <h3>🛠 Tech Stack</h3>
+      <div class="check-item"><span style="font-size:15px">🤝</span><div><strong>Multica</strong> — open source human + agent platform</div></div>
+      <div class="check-item"><span style="font-size:15px">🧠</span><div><strong>Claude Code</strong> — via AWS Bedrock (EU region) eller Foundry</div></div>
+      <div class="check-item"><span style="font-size:15px">🏗</span><div><strong>Terraform</strong> — IaC for ACI + Front Door</div></div>
+      <div class="check-item"><span style="font-size:15px">📦</span><div><strong>Azure Container Instances</strong> — enkel deploy uten plattformteam</div></div>
+      <div class="check-item"><span style="font-size:15px">🌐</span><div><strong>Azure Front Door</strong> — routing og SSL foran ACI</div></div>
+      <div class="check-item"><span style="font-size:15px">💬</span><div><strong>Microsoft Teams</strong> — instruktørstøtte på avstand</div></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Toggle day columns
+function toggleDay(el) {
+  el.classList.toggle('expanded');
+}
+
+// Progress tracker
+let currentStep = -1;
+function setStep(n) {
+  currentStep = n;
+  const steps = document.querySelectorAll('.p-step');
+  const conns = document.querySelectorAll('.p-connector');
+  steps.forEach((s, i) => {
+    s.classList.remove('done', 'active');
+    if (i < n) s.classList.add('done');
+    else if (i === n) s.classList.add('active');
+  });
+  conns.forEach((c, i) => {
+    c.classList.toggle('done', i < n);
+  });
+}
+
+// Scroll animations
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 80);
+    }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.anim-in').forEach(el => observer.observe(el));
+
+// Start all days expanded on desktop
+document.querySelectorAll('.day-col').forEach(d => d.classList.add('expanded'));
+</script>
+</body>
+</html>
