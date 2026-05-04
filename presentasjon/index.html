@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plattformtjeneste – Sopra Steria & Bane NOR</title>
+<style>
+  :root {
+    --purple:    #4d1d82;
+    --dark:      #2A1449;
+    --orange:    #f07d00;
+    --black:     #1d1d1b;
+    --grey:      #a8a8a7;
+    --light:     #ededed;
+    --bg-purple: #ede9f2;
+    --bg-beige:  #fdf2e5;
+    --grad: linear-gradient(to right,#4d1d82 0%,#8b1d82 10%,#cf022b 60%,#f07d00 100%);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: Tahoma, Arial, sans-serif;
+    background: #1a1a1a;
+    width: 100vw; height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+
+  /* ── 16:9 STAGE ── */
+  #stage {
+    width: 960px;
+    height: 540px;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  /* ── SLIDES ── */
+  .slide {
+    position: absolute; inset: 0;
+    display: none; flex-direction: column;
+    animation: up .22s ease;
+    overflow: hidden;
+  }
+  .slide.active { display: flex; }
+  @keyframes up { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+
+  /* ── CHROME ── */
+  .bar { height: 4px; background: var(--grad); flex-shrink: 0; }
+
+  .body {
+    flex: 1;
+    padding: 32px 52px 16px;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+
+  .nav {
+    height: 38px;
+    display: flex; align-items: center;
+    justify-content: space-between;
+    padding: 0 52px;
+    flex-shrink: 0;
+  }
+  .nav-brand { font-size: 10px; font-weight: bold; }
+  .nav-dots  { display: flex; gap: 6px; align-items: center; }
+  .dot       { width: 6px; height: 6px; border-radius: 50%; border: none; cursor: pointer; transition: all .2s; }
+  .nav-ctr   { font-size: 10px; min-width: 32px; text-align: right; }
+  .nav-arrows{ display: flex; gap: 6px; }
+  .arrow {
+    width: 26px; height: 26px; border-radius: 50%; border: none;
+    cursor: pointer; font-size: 12px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .15s;
+  }
+  .arrow:hover    { transform: scale(1.12); }
+  .arrow:disabled { opacity: .3; cursor: default; transform: none; }
+
+  /* ── DARK ── */
+  .dark { background: var(--dark); color: #fff; }
+  .dark .nav            { border-top: 1px solid rgba(255,255,255,.08); }
+  .dark .nav-brand      { color: #fff; }
+  .dark .nav-ctr        { color: rgba(255,255,255,.3); }
+  .dark .dot            { background: rgba(255,255,255,.2); }
+  .dark .dot.on         { background: var(--orange); transform: scale(1.4); }
+  .dark .arrow          { background: rgba(255,255,255,.1); color: #fff; }
+  .dark .arrow:hover    { background: rgba(255,255,255,.2); }
+
+  /* ── LIGHT ── */
+  .light { background: #fff; color: var(--black); }
+  .light .nav           { border-top: 1px solid var(--light); }
+  .light .nav-brand     { color: var(--purple); }
+  .light .nav-ctr       { color: var(--grey); }
+  .light .dot           { background: var(--light); }
+  .light .dot.on        { background: var(--orange); transform: scale(1.4); }
+  .light .arrow         { background: var(--bg-purple); color: var(--purple); }
+  .light .arrow:hover   { filter: brightness(.93); }
+
+  /* ── TYPE ── */
+  .eyebrow { font-size:9px; letter-spacing:2.5px; text-transform:uppercase; color:var(--orange); font-weight:bold; margin-bottom:10px; }
+  .h1      { font-size:32px; font-weight:bold; line-height:1.1; margin-bottom:12px; }
+  .h2      { font-size:20px; font-weight:bold; color:var(--purple); line-height:1.2; }
+  .lead    { font-size:12px; color:rgba(255,255,255,.62); line-height:1.6; max-width:520px; }
+  .muted   { font-size:11px; color:var(--grey); margin-top:3px; }
+  .obar    { width:36px; height:3px; background:var(--orange); margin-bottom:14px; }
+
+  /* ── META (title) ── */
+  .meta { display:flex; gap:32px; margin-top:28px; flex-wrap:wrap; }
+  .mi   { display:flex; flex-direction:column; gap:2px; }
+  .ml   { font-size:8px; color:rgba(255,255,255,.38); letter-spacing:2px; text-transform:uppercase; }
+  .mv   { font-size:11px; color:#fff; font-weight:bold; }
+
+  /* ── GRIDS ── */
+  .g2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--bg-purple);
+    border-radius: 3px; padding: 14px;
+    position: relative; overflow: hidden;
+  }
+  .card::before {
+    content:''; position:absolute;
+    top:0; left:0; right:0; height:2px;
+    background: var(--grad);
+  }
+  .card.beige { background: var(--bg-beige); }
+  .card h3    { font-size:11px; font-weight:bold; color:var(--purple); margin-bottom:6px; }
+  .card p     { font-size:11px; color:var(--black); line-height:1.55; }
+  .ci         { font-size:18px; margin-bottom:8px; display:block; }
+  .card ul    { list-style:none; margin-top:4px; }
+  .card li    { font-size:11px; color:var(--black); line-height:1.55; padding-left:11px; position:relative; }
+  .card li::before { content:'›'; color:var(--orange); position:absolute; left:0; font-weight:bold; }
+
+  /* ── CHANGE LIST ── */
+  .cl    { list-style:none; display:flex; flex-direction:column; gap:7px; }
+  .cl li {
+    display:flex; align-items:flex-start; gap:10px;
+    font-size:11px; color:var(--black); line-height:1.5;
+    background:var(--bg-purple); border-radius:3px;
+    padding:9px 12px; position:relative; overflow:hidden;
+  }
+  .cl li::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--grad); }
+  .cl-num {
+    flex-shrink:0; width:18px; height:18px; border-radius:50%;
+    background:var(--purple); color:#fff;
+    font-size:9px; font-weight:bold;
+    display:flex; align-items:center; justify-content:center;
+    margin-top:1px;
+  }
+
+  /* ── INFO BOX ── */
+  .info { background:var(--purple); border-radius:3px; padding:12px 16px; margin-bottom:12px; }
+  .info .lbl { font-size:8px; text-transform:uppercase; letter-spacing:2px; color:var(--orange); font-weight:bold; margin-bottom:5px; }
+  .info p    { font-size:11px; line-height:1.6; color:rgba(255,255,255,.88); }
+
+  /* ── NOTE ── */
+  .note { background:var(--bg-beige); border-left:3px solid var(--orange); padding:9px 12px; font-size:10px; line-height:1.6; border-radius:0 3px 3px 0; color:var(--black); }
+  .note strong { color:var(--purple); }
+
+  /* ── TABLES ── */
+  table  { width:100%; border-collapse:collapse; font-size:10px; }
+  thead tr { background:var(--purple); color:#fff; }
+  th     { padding:7px 10px; text-align:left; font-size:9px; text-transform:uppercase; letter-spacing:1px; }
+  td     { padding:7px 10px; border-bottom:1px solid var(--light); vertical-align:top; line-height:1.45; }
+  tr:nth-child(even) td { background:var(--bg-purple); }
+  .tag   { display:inline-block; font-size:8px; font-weight:bold; letter-spacing:1px; text-transform:uppercase; padding:1px 5px; border-radius:2px; }
+  .ti    { background:var(--orange); color:#fff; }
+  .td    { background:var(--purple); color:#fff; }
+
+  /* HUKI */
+  .hrow td { background:var(--bg-beige)!important; font-weight:bold; color:var(--purple); font-size:8px; letter-spacing:1px; text-transform:uppercase; padding:4px 10px; }
+  th.c, td.c { text-align:center; width:80px; }
+  .badge { display:inline-flex; width:18px; height:18px; border-radius:50%; font-weight:bold; font-size:9px; align-items:center; justify-content:center; }
+  .bH { background:var(--purple); color:#fff; }
+  .bU { background:var(--orange); color:#fff; }
+  .bK { background:var(--bg-purple); color:var(--purple); border:1px solid var(--purple); }
+  .bI { background:var(--light); color:var(--grey); }
+  .bN { color:var(--light); font-size:13px; }
+
+  /* ── TIMELINE ── */
+  .tl { display:flex; align-items:flex-start; position:relative; margin-top:10px; }
+  .tl::before { content:''; position:absolute; top:14px; left:14px; right:14px; height:2px; background:var(--grad); }
+  .ti2  { flex:1; display:flex; flex-direction:column; align-items:center; gap:7px; position:relative; z-index:1; }
+  .tdot { width:28px; height:28px; border-radius:50%; background:var(--purple); border:2px solid #fff; box-shadow:0 0 0 2px var(--purple); display:flex; align-items:center; justify-content:center; font-size:11px; }
+  .tdot.o { background:var(--orange); box-shadow:0 0 0 2px var(--orange); }
+  .tc   { text-align:center; }
+  .tdate{ font-size:8px; font-weight:bold; color:var(--orange); text-transform:uppercase; letter-spacing:1px; margin-bottom:2px; }
+  .ttl  { font-size:10px; font-weight:bold; color:var(--black); }
+  .tsub { font-size:9px; color:var(--grey); margin-top:1px; }
+
+  /* ── SLA ── */
+  .sla-g { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .sla-b { border:2px solid var(--bg-purple); border-radius:3px; padding:12px; }
+  .sla-b.p{ border-color:var(--purple); background:var(--bg-purple); }
+  .sla-l { font-size:8px; text-transform:uppercase; letter-spacing:2px; font-weight:bold; color:var(--grey); margin-bottom:4px; }
+  .sla-c { font-size:30px; font-weight:bold; color:var(--purple); line-height:1; }
+  .sla-c.o{ color:var(--orange); }
+  .sla-d { font-size:10px; color:var(--black); margin-top:5px; line-height:1.4; }
+  .sla-o { margin-top:6px; font-size:9px; color:var(--orange); font-weight:bold; }
+</style>
+</head>
+<body>
+<div id="stage">
+
+<!-- SLIDE 1: TITTEL -->
+<div class="slide dark active">
+  <div class="bar"></div>
+  <div class="body" style="justify-content:center;">
+    <div style="position:absolute;top:22px;right:52px;text-align:right;">
+      <div style="font-size:13px;font-weight:bold;color:#fff;">Sopra Steria</div>
+      <div style="font-size:8px;color:rgba(255,255,255,.38);letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;">The world is how we shape it.</div>
+    </div>
+    <div class="eyebrow">Tilbud til Bane NOR · 2026</div>
+    <div class="h1">Plattformtjeneste for<br>Utvikler- og<br>Integrasjonsplattform</div>
+    <div class="lead">Helhetlig drift, vedlikehold og videreutvikling av Bane NORs strategiske plattformer – levert som tjeneste under eksisterende avtale.</div>
+    <div class="meta">
+      <div class="mi"><div class="ml">Oppstart</div><div class="mv">01.09.2026</div></div>
+      <div class="mi"><div class="ml">Varighet</div><div class="mv">1 år + opsjon 1+1</div></div>
+      <div class="mi"><div class="ml">Avtaleform</div><div class="mv">Endringsordre på eksisterende avtale</div></div>
+      <div class="mi"><div class="ml">Leverandør</div><div class="mv">Sopra Steria AS</div></div>
+    </div>
+  </div>
+  <div class="nav">
+    <span class="nav-brand">Sopra Steria</span>
+    <div class="nav-dots"></div>
+    <span class="nav-ctr"></span>
+    <div class="nav-arrows"><button class="arrow prev">←</button><button class="arrow next">→</button></div>
+  </div>
+</div>
+
+<!-- SLIDE 2: EXECUTIVE SUMMARY -->
+<div class="slide dark">
+  <div class="bar"></div>
+  <div class="body" style="justify-content:center;">
+    <div class="eyebrow">Executive Summary</div>
+    <div style="font-size:18px;font-weight:bold;color:#fff;line-height:1.2;margin-bottom:20px;max-width:700px;">
+      Fra konsulentkjøp til tjeneste – samme team, ny avtaleform
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;">
+      <div style="background:rgba(255,255,255,0.95);border-radius:3px;padding:16px;border-top:3px solid var(--orange);">
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--orange);font-weight:bold;margin-bottom:8px;">Bakgrunn</div>
+        <p style="font-size:11px;color:var(--black);line-height:1.6;">Bane NOR ønsker å frigjøre konsulentramme (1,2 mrd. kr) og sikre mer forutsigbar leveranse. Sopra Steria har levert plattformene som konsulenttjeneste og tar nå over som tjenesteleverandør under eksisterende avtale.</p>
+      </div>
+      <div style="background:rgba(255,255,255,0.95);border-radius:3px;padding:16px;border-top:3px solid var(--orange);">
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--orange);font-weight:bold;margin-bottom:8px;">Leveransen</div>
+        <p style="font-size:11px;color:var(--black);line-height:1.6;">To dedikerte team – ett per plattform – med helhetlig ansvar for drift, vedlikehold og kontinuerlig videreutvikling. Inkluderer teamlead, techlead, security champion og plattformingeniører per plattform.</p>
+      </div>
+      <div style="background:rgba(255,255,255,0.95);border-radius:3px;padding:16px;border-top:3px solid var(--orange);">
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--orange);font-weight:bold;margin-bottom:8px;">Rammer</div>
+        <p style="font-size:11px;color:var(--black);line-height:1.6;">Oppstart 01.09.2026. Varighet 1 år med opsjon 1+1. SLA klasse D (standard arbeidstid) med 24/7 som opsjon. Endringsordre på eksisterende IKT-driftsavtale.</p>
+      </div>
+      <div style="background:rgba(255,255,255,0.95);border-radius:3px;padding:16px;border-top:3px solid var(--orange);">
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--orange);font-weight:bold;margin-bottom:8px;">Hvorfor Sopra Steria</div>
+        <p style="font-size:11px;color:var(--black);line-height:1.6;">Kjenner plattformene fra dag én. Trygg overgang uten kompetansetap. Proaktiv tilnærming – foreslår forbedringer fremfor kun å reagere på hendelser.</p>
+      </div>
+    </div>
+  </div>
+  <div class="nav">
+    <span class="nav-brand">Sopra Steria</span>
+    <div class="nav-dots"></div>
+    <span class="nav-ctr"></span>
+    <div class="nav-arrows"><button class="arrow prev">←</button><button class="arrow next">→</button></div>
+  </div>
+</div>
+
+<!-- SLIDE 3: BAKGRUNN -->
+<div class="slide light">
+  <div class="bar"></div>
+  <div class="body">
+    <div class="obar"></div>
+    <div class="h2">Bakgrunn</div>
+    <div class="muted" style="margin-bottom:14px;">Hvorfor Bane NOR ønsker en ny leveransemodell</div>
+    <div class="info">
+      <div class="lbl">Situasjonen i dag</div>
+      <p>Bane NOR kjøper ressurser gjennom konsulenttjenester under driftsavtalen. Dette tærer raskt på konsulentrammen (1,2 mrd. kr) og gir begrenset forutsigbarhet. Bane NOR ønsker fremover å kjøpe dette som en tjeneste under eksisterende IKT-driftsavtale.</p>
+    </div>
+    <div class="g3">
+      <div class="card"><span class="ci">💰</span><h3>Frigjøre konsulentramme</h3><p>Tjenestekjøp belaster avtalen annerledes og frigjør midler til andre prioriterte aktiviteter.</p></div>
+      <div class="card beige"><span class="ci">📋</span><h3>Forutsigbar leveranse</h3><p>Fast tjeneste gir bedre kostnadskontroll og tydeligere ansvar enn timebasert konsulentbruk.</p></div>
+      <div class="card"><span class="ci">🤝</span><h3>Kjent leverandør</h3><p>Sopra Steria kjenner plattformene godt og sikrer trygg overgang til ny leveransemodell.</p></div>
+    </div>
+  </div>
+  <div class="nav">
+    <span class="nav-brand">Sopra Steria</span>
+    <div class="nav-dots"></div>
+    <span class="nav-ctr"></span>
+    <div class="nav-arrows"><button class="arrow prev">←</button><button class="arrow next">→</button></div>
+  </div>
+</div>
+
+<!-- SLIDE 3: PLATTFORMENE -->
+<div class="slide light">
+  <div class="bar"></div>
+  <div class="body">
+    <div class="obar"></div>
+    <div class="h2">To strategiske plattformer</div>
+    <div class="muted" style="margin-bottom:14px;">Sentrale i Bane NORs referansearkitektur – pålagt brukt av alle tjenesteteam</div>
+    <div class="g2" style="flex:1;">
+      <div>
+        <div style="margin-bottom:8px;"><span class="tag ti" style="padding:3px 9px;font-size:10px;">Integrasjonsplattform</span></div>
+        <div class="card" style="margin-bottom:8px;"><h3>Komponenter</h3><ul><li>Azure API Management</li><li>Confluent Kafka</li><li>Event Issuer &amp; Payload Manager</li><li>HiveMQ</li><li>Azure Kubernetes Service (AKS)</li></ul></div>
+        <div class="card beige"><h3>Status</h3><ul><li>Aktiv videreutvikling pågår</li><li>OT/KV-komponenter etableres OnPrem</li><li>Vil få behov for 24/7 fremover</li></ul></div>
+      </div>
+      <div>
+        <div style="margin-bottom:8px;"><span class="tag td" style="padding:3px 9px;font-size:10px;">Utviklerplattform (Bullet)</span></div>
+        <div class="card" style="margin-bottom:8px;"><h3>Komponenter</h3><ul><li>Azure Kubernetes Services (AKS)</li><li>Felles rammeverk og verktøy</li><li>Standardiserte sikkerhetsløsninger</li><li>GitHub CI/CD-pipelines</li></ul></div>
+        <div class="card beige"><h3>Status</h3><ul><li>I stor grad over i ren drift</li><li>Ingen 24/7-behov i dag</li><li>Alle tjenesteteam pålagt å bruke den</li></ul></div>
+      </div>
+    </div>
+  </div>
+  <div class="nav">
+    <span class="nav-brand">Sopra Steria</span>
+    <div class="nav-dots"></div>
+    <span class="nav-ctr"></span>
+    <div class="nav-arrows"><button class="arrow prev">←</button><button class="arrow next">→</button></div>
+  </div>
+</div>
+
+<!-- SLIDE 4: OMFANG -->
+<div class="slide light">
+  <div class="bar"></div>
+  <div class="body">
+    <div class="obar"></div>
+    <div class="h2">Omfang og leveranser</div>
+    <div class="muted" style="margin-bottom:14px;">Tre leveranseområder – proaktivt og helhetlig</div>
+    <div class="g3" style="margin-bottom:10px;">
+      <div class="card"><span class="ci">⚙️</span><h3>Drift</h3><ul><li>Overvåking og administrasjon</li><li>Brukerstøtte og onboarding</li><li>Implementering av sikkerhetstiltak</li><li>Incident response</li><li>Administrasjon av kjøretidsmiljø</li></ul></div>
+      <div class="card beige"><span class="ci">🔧</span><h3>Vedlikehold</h3><ul><li>Feilretting og patching</li><li>Versjonskontroll og oppgraderinger</li><li>Dokumentasjon og sporbarhet</li><li>Kostnadsoptimalisering</li><li>Automatisering og selvbetjening</li></ul></div>
+      <div class="card"><span class="ci">🚀</span><h3>Videreutvikling</h3><ul><li>Proaktive forbedringsforslag</li><li>Kubernetes-skalering</li><li>Strategisk plattformutvikling</li><li>Månedlig brukerforum og demo</li><li>Support via Teams (arbeidstid)</li></ul></div>
+    </div>
+    <div class="note"><strong>Endringsordrer:</strong> Nye behov utenfor avtalens scope meldes som endringsordrer og behandles som forvaltningsoppgaver.</div>
+  </div>
+  <div class="nav">
+    <span class="nav-brand">Sopra Steria</span>
+    <div class="nav-dots"></div>
+    <span class="nav-ctr"></span>
+    <div class="nav-arrows"><button class="arrow prev">←</button><button class="arrow next">→</button></div>
+  </div>
+</div>
+
+<!-- SLIDE 5: ROLLER -->
+<div class="slide light">
+  <div class="bar"></div>
+  <div class="body">
+    <div class="obar"></div>
+    <div class="h2">Roller og teamorganisering</div>
+    <div class="muted" style="margin-bottom:12px;">To dedikerte team – ett per plattform</div>
+    <table style="margin-bottom:10px;">
+      <thead><tr><th>Plattform</th><th>Rolle</th><th>Ansvarsområde</th></tr></thead>
+      <tbody>
+        <tr><td><span class="tag ti">Integrasjon</span></td><td><strong>Teamlead</strong></td><td>Leder teamet, kontaktpunkt mot BN, sikrer prioritering og fremdrift.</td></tr>
+        <tr><td><span class="tag ti">Integrasjon</span></td><td><strong>Techlead</strong></td><td>Teknisk ansvarlig, leder teknologivalg og arkitektur.</td></tr>
+        <tr><td><span class="tag ti">Integrasjon</span></td><td><strong>Plattformingeniør</strong></td><td>Utfører drift, overvåking, feilretting, patching og videreutvikling.</td></tr>
+        <tr><td><span class="tag ti">Integrasjon</span></td><td><strong>Security Champion</strong></td><td>Innhenter og implementerer krav fra Digital Sikkerhet.</td></tr>
+        <tr><td><span class="tag td">Utvikler</span></td><td><strong>Teamlead</strong></td><td>Leder teamet, kontaktpunkt mot BN, sikrer prioritering og fremdrift.</td></tr>
+        <tr><td><span class="tag td">Utvikler</span></td><td><strong>Techlead</strong></td><td>Teknisk ansvarlig, leder teknologivalg og arkitektur.</td></tr>
+        <tr><td><span class="tag td">Utvikler</span></td><td><strong>Plattformingeniør</strong></td><td>Utfører drift, automatisering, standardisering og teknisk onboarding.</td></tr>
+        <tr><td><span class="tag td">Utvikler</span></td><td><strong>Security Champion</strong></td><td>Innhenter og implementerer krav fra Digital Sikkerhet.</td></tr>
+      </tbody>
+    </table>
+    <div class="g2">
+      <div class="card" style="padding:10px;"><h3>Bane NOR stiller med</h3><p style="margin-top:3px;"><strong>Plattformeier</strong> per plattform som prioriterer leveranser og representerer BNs interesser.</p></div>
+      <div class="card beige" style="padding:10px;"><h3>Arbeidssted</h3><p style="margin-top:3px;">Teamleads og techleads arbeider fra Bane NORs lokaler der det er hensiktsmessig.</p></div>
+    </div>
+  </div>
+  <div class="nav">
+    <span class="nav-brand">Sopra Steria</span>
+    <div class="nav-dots"></div>
+    <span class="nav-ctr"></span>
+    <div class="nav-arrows"><button class="arrow prev">←</button><button class="arrow next">→</button></div>
+  </div>
+</div>
+
+<!-- SLIDE 6: HUKI -->
+<div class="slide light">
+  <div class="bar"></div>
+  <div class="body">
+    <div class="obar"></div>
+    <div class="h2">Ansvarsfordeling (HUKI)</div>
+    <div class="muted" style="margin-bottom:8px;">Scope for denne endringsordren – * reguleres av IKT-driftsavtalen</div>
+    <div style="overflow-y:auto;flex:1;margin-bottom:7px;">
+    <table style="font-size:10px;">
+      <thead><tr><th style="padding:6px 10px;">Ansvarsområde</th><th class="c" style="padding:6px 10px;">Sopra Steria</th><th class="c" style="padding:6px 10px;">Bane NOR</th></tr></thead>
+      <tbody>
+        <tr class="hrow"><td colspan="3">Drift og overvåking</td></tr>
+        <tr><td style="padding:4px 10px;">Overvåking og alarmer (plattformkomponenter)</td><td class="c" style="padding:4px 10px;"><span class="badge bH">H</span></td><td class="c" style="padding:4px 10px;"><span class="badge bI">I</span></td></tr>
+        <tr><td style="padding:4px 10px;">Incident response – plattformfeil</td><td class="c" style="padding:4px 10px;"><span class="badge bH">H</span></td><td class="c" style="padding:4px 10px;"><span class="badge bK">K</span></td></tr>
+        <tr><td style="padding:4px 10px;">Incident response – applikasjonsfeil (tjenesteteam)</td><td class="c" style="padding:4px 10px;"><span class="badge bI">I</span></td><td class="c" style="padding:4px 10px;"><span class="badge bH">H</span></td></tr>
+        <tr class="hrow"><td colspan="3">Vedlikehold og videreutvikling</td></tr>
+        <tr><td style="padding:4px 10px;">Patching og versjonshåndtering</td><td class="c" style="padding:4px 10px;"><span class="badge bH">H</span></td><td class="c" style="padding:4px 10px;"><span class="badge bK">K</span></td></tr>
+        <tr><td style="padding:4px 10px;">Kubernetes-konfigurasjon og skalering</td><td class="c" style="padding:4px 10px;"><span class="badge bH">H</span></td><td class="c" style="padding:4px 10px;"><span class="badge bK">K</span></td></tr>
+        <tr><td style="padding:4px 10px;">Implementering av sikkerhetskrav (Security Champion)</td><td class="c" style="padding:4px 10px;"><span class="badge bH">H</span></td><td class="c" style="padding:4px 10px;"><span class="badge bK">K</span></td></tr>
+        <tr><td style="padding:4px 10px;">Prioritering av backlog</td><td class="c" style="padding:4px 10px;"><span class="badge bU">U</span></td><td class="c" style="padding:4px 10px;"><span class="badge bH">H</span></td></tr>
+        <tr><td style="padding:4px 10px;">Gjennomføring av godkjente oppgaver</td><td class="c" style="padding:4px 10px;"><span class="badge bH">H</span></td><td class="c" style="padding:4px 10px;"><span class="badge bK">K</span></td></tr>
+        <tr class="hrow"><td colspan="3">Brukerstøtte og onboarding</td></tr>
+        <tr><td style="padding:4px 10px;">Onboarding av tjenesteteam</td><td class="c" style="padding:4px 10px;"><span class="badge bH">H</span></td><td class="c" style="padding:4px 10px;"><span class="badge bK">K</span></td></tr>
+        <tr><td style="padding:4px 10px;">Brukerstøtte via Teams-kanal (arbeidstid)</td><td class="c" style="padding:4px 10px;"><span class="badge bH">H</span></td><td class="c" style="padding:4px 10px;"><span class="badge bI">I</span></td></tr>
+        <tr><td style="padding:4px 10px;">Månedlig brukerforum / demo</td><td class="c" style="padding:4px 10px;"><span class="badge bH">H</span></td><td class="c" style="padding:4px 10px;"><span class="badge bK">K</span></td></tr>
+        <tr class="hrow"><td colspan="3">Utenfor denne endringsordren *</td></tr>
+        <tr><td style="padding:4px 10px;">Applikasjonsforvaltning – tjenesteteamenes apper</td><td class="c" style="padding:4px 10px;"><span class="badge bN">—</span></td><td class="c" style="padding:4px 10px;"><span class="badge bH">H</span></td></tr>
+        <tr><td style="padding:4px 10px;">Identitetshåndtering (IAM) &amp; nettverksinfrastruktur</td><td class="c" style="padding:4px 10px;"><span class="badge bN">—</span></td><td class="c" style="padding:4px 10px;"><span class="badge bH">H</span></td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div style="display:flex;gap:12px;font-size:9px;color:var(--grey);align-items:center;flex-wrap:wrap;">
+      <span><span class="badge bH" style="width:15px;height:15px;font-size:8px;">H</span> Har ansvar</span>
+      <span><span class="badge bU" style="width:15px;height:15px;font-size:8px;">U</span> Understøtter</span>
+      <span><span class="badge bK" style="width:15px;height:15px;font-size:8px;">K</span> Kontrollerer</span>
+      <span><span class="badge bI" style="width:15px;height:15px;font-size:8px;">I</span> Informeres</span>
+      <span><span class="badge bN" style="width:15px;height:15px;">—</span> Ikke involvert</span>
+    </div>
+  </div>
+  <div class="nav">
+    <span class="nav-brand">Sopra Steria</span>
+    <div class="nav-dots"></div>
+    <span class="nav-ctr"></span>
+    <div class="nav-arrows"><button class="arrow prev">←</button><button class="arrow next">→</button></div>
+  </div>
+</div>
+
+<!-- SLIDE 7: SLA OG VARIGHET -->
+<div class="slide light">
+  <div class="bar"></div>
+  <div class="body">
+    <div class="obar"></div>
+    <div class="h2">SLA og avtalevarighet</div>
+    <div class="muted" style="margin-bottom:18px;">Klare rammer og fleksibilitet for fremtiden</div>
+    <div class="g2" style="gap:40px;flex:1;">
+      <div>
+        <div style="font-size:11px;font-weight:bold;color:var(--purple);margin-bottom:10px;">SLA-klassifisering</div>
+        <div class="sla-g">
+          <div class="sla-b p"><div class="sla-l">Standard</div><div class="sla-c">D</div><div class="sla-d">Ordinær arbeidstid og standard responstider iht. gjeldende avtale.</div></div>
+          <div class="sla-b"><div class="sla-l">Opsjon</div><div class="sla-c o">B</div><div class="sla-d">24/7 beredskap ved behov.</div><div class="sla-o">⊕ Kan legges til</div></div>
+        </div>
+        <div class="note" style="margin-top:10px;"><strong>Merk:</strong> Integrasjonsplattformen vil over tid få behov for 24/7 grunnet OT-behov. Opsjon B anbefales vurdert ved avtaleinngåelse.</div>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:bold;color:var(--purple);margin-bottom:10px;">Avtaleperiode</div>
+        <div class="tl">
+          <div class="ti2"><div class="tdot">📋</div><div class="tc"><div class="tdate">Q2 2026</div><div class="ttl">Avtaleinngåelse</div><div class="tsub">Signering</div></div></div>
+          <div class="ti2"><div class="tdot o">🚀</div><div class="tc"><div class="tdate">01.09.2026</div><div class="ttl">Oppstart</div><div class="tsub">Tjenesten aktiv</div></div></div>
+          <div class="ti2"><div class="tdot">📅</div><div class="tc"><div class="tdate">01.09.2027</div><div class="ttl">År 1 ferdig</div><div class="tsub">Opsjon +1 år</div></div></div>
+          <div class="ti2"><div class="tdot">🔁</div><div class="tc"><div class="tdate">01.09.2029</div><div class="ttl">Maks varighet</div><div class="tsub">1+1+1 år</div></div></div>
+        </div>
+        <div class="card" style="margin-top:18px;padding:11px;">
+          <h3>Overgangsperiode</h3>
+          <p style="margin-top:3px;">BN har bestilt utvidet konsulentkjøp frem til september 2026 – sikrer kontinuitet frem til ny avtale trer i kraft.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="nav">
+    <span class="nav-brand">Sopra Steria</span>
+    <div class="nav-dots"></div>
+    <span class="nav-ctr"></span>
+    <div class="nav-arrows"><button class="arrow prev">←</button><button class="arrow next">→</button></div>
+  </div>
+</div>
+
+<!-- SLIDE 8: VIKTIGSTE ENDRINGER -->
+<div class="slide light">
+  <div class="bar"></div>
+  <div class="body">
+    <div class="obar"></div>
+    <div class="h2">Viktigste endringer fra opprinnelig forslag</div>
+    <div class="muted" style="margin-bottom:14px;">Fra Bane NORs første utkast til nåværende versjon</div>
+    <ul class="cl">
+      <li><div class="cl-num">1</div><div><strong>Teknologinøytrale formuleringer</strong> — Navngitte produkter erstattet med agnostiske beskrivelser for å håndtere fremtidige teknologiskifter.</div></li>
+      <li><div class="cl-num">2</div><div><strong>To separate team</strong> — Eksplisitt oppdelt i ett team per plattform, med egne roller og kompetansekrav.</div></li>
+      <li><div class="cl-num">3</div><div><strong>Plattformingeniør som egen rolle</strong> — Presisert at tekniske ressurser ikke er dekket av teamlead/techlead-rollene.</div></li>
+      <li><div class="cl-num">4</div><div><strong>HUKI-matrise</strong> — Tydeliggjør ansvarsfordeling og avgrenser hva som reguleres av IKT-driftsavtalen.</div></li>
+      <li><div class="cl-num">5</div><div><strong>24/7 som opsjon</strong> — Fjernet som standard, lagt inn som valgfri opsjon (klasse B) – særlig aktuelt for integrasjonsplattformen.</div></li>
+      <li><div class="cl-num">6</div><div><strong>SLA endret fra klasse B til D</strong> — Riktig klassifisering for ordinær arbeidstid som grunnlinje.</div></li>
+      <li><div class="cl-num">7</div><div><strong>Avtaleform korrigert</strong> — Endringsordre på eksisterende avtale (ikke ny SSA-D).</div></li>
+      <li><div class="cl-num">8</div><div><strong>Detaljerte kompetansekrav</strong> — Ny seksjon med felles og plattformspesifikke krav, inkl. krav til kontinuitet og rådgivningsevne.</div></li>
+    </ul>
+  </div>
+  <div class="nav">
+    <span class="nav-brand">Sopra Steria</span>
+    <div class="nav-dots"></div>
+    <span class="nav-ctr"></span>
+    <div class="nav-arrows"><button class="arrow prev">←</button><button class="arrow next">→</button></div>
+  </div>
+</div>
+
+</div><!-- /stage -->
+
+<script>
+  const stage  = document.getElementById('stage');
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const total  = slides.length;
+  let cur = 0;
+
+  // ── SCALE TO FIT WINDOW ──
+  function resize() {
+    const scaleX = window.innerWidth  / 960;
+    const scaleY = window.innerHeight / 540;
+    const scale  = Math.min(scaleX, scaleY);
+    stage.style.transform = `scale(${scale})`;
+    stage.style.transformOrigin = 'center center';
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // ── NAVIGATION ──
+  function goTo(n) {
+    slides[cur].classList.remove('active');
+    cur = Math.max(0, Math.min(total - 1, n));
+    slides[cur].classList.add('active');
+    update();
+  }
+
+  function update() {
+    slides.forEach(s => {
+      s.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('on', i === cur));
+      s.querySelector('.nav-ctr').textContent = (cur + 1) + ' / ' + total;
+      s.querySelector('.prev').disabled = cur === 0;
+      s.querySelector('.next').disabled = cur === total - 1;
+    });
+  }
+
+  slides.forEach(s => {
+    const dotsEl = s.querySelector('.nav-dots');
+    slides.forEach((_, i) => {
+      const d = document.createElement('button');
+      d.className = 'dot';
+      d.addEventListener('click', () => goTo(i));
+      dotsEl.appendChild(d);
+    });
+    s.querySelector('.prev').addEventListener('click', () => goTo(cur - 1));
+    s.querySelector('.next').addEventListener('click', () => goTo(cur + 1));
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goTo(cur + 1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   goTo(cur - 1);
+  });
+
+  update();
+</script>
+</body>
+</html>
