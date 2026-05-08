@@ -3,570 +3,416 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Plattformtjeneste – Sopra Steria & Bane NOR</title>
+<title>Multica – The AI Show 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --purple:    #4d1d82;
-    --dark:      #2A1449;
-    --orange:    #f07d00;
-    --black:     #1d1d1b;
-    --grey:      #a8a8a7;
-    --light:     #ededed;
-    --bg-purple: #ede9f2;
-    --bg-beige:  #fdf2e5;
-    --grad: linear-gradient(to right,#4d1d82 0%,#8b1d82 10%,#cf022b 60%,#f07d00 100%);
-  }
+:root {
+  --purple: #4d1d82;
+  --orange: #f07d00;
+  --red: #cf022b;
+  --warm-purple: #8b1d82;
+  --bg: #0e0b15;
+  --surface: #1a1228;
+  --surface2: #221933;
+  --text: #f0ebfa;
+  --muted: rgba(240,235,250,0.55);
+  --grad: linear-gradient(90deg, #4d1d82 0%, #8b1d82 15%, #cf022b 60%, #f07d00 100%);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; height:100%; overflow:hidden; font-family:'Space Grotesk',Tahoma,sans-serif; background:var(--bg); color:var(--text); }
 
-  * { margin:0; padding:0; box-sizing:border-box; }
+/* ── SCALE WRAPPER: design at 1440×900, scale to fit any screen ── */
+#deck {
+  position:fixed; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--bg);
+}
 
-  body {
-    font-family: Tahoma, Arial, sans-serif;
-    background: #1a1a1a;
-    width: 100vw; height: 100vh;
-    display: flex; align-items: center; justify-content: center;
-    overflow: hidden;
-  }
+#scaler {
+  width:1440px; height:900px;
+  position:relative;
+  transform-origin:center center;
+}
 
-  /* ── 16:9 STAGE ── */
-  #stage {
-    width: 960px;
-    height: 540px;
-    position: relative;
-    flex-shrink: 0;
-  }
+#progress { position:absolute; top:0; left:0; height:3px; width:0; background:var(--grad); transition:width 0.4s ease; z-index:100; }
 
-  /* ── SLIDES ── */
-  .slide {
-    position: absolute; inset: 0;
-    display: none; flex-direction: column;
-    animation: up .22s ease;
-    overflow: hidden;
-  }
-  .slide.active { display: flex; }
-  @keyframes up { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+.slide {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column; justify-content:center;
+  padding: 80px 130px;
+  opacity:0; transform:translateX(60px);
+  transition:opacity 0.5s ease, transform 0.5s ease;
+  pointer-events:none; overflow:hidden;
+}
+.slide::before {
+  content:''; position:absolute; top:-200px; right:-200px;
+  width:600px; height:600px; border-radius:50%;
+  background:radial-gradient(circle, rgba(77,29,130,0.28) 0%, transparent 70%);
+  pointer-events:none;
+}
+.slide.active { opacity:1; transform:translateX(0); pointer-events:all; }
+.slide.exit { opacity:0; transform:translateX(-60px); transition:opacity 0.3s ease, transform 0.3s ease; }
 
-  /* ── CHROME ── */
-  .bar { height: 4px; background: var(--grad); flex-shrink: 0; }
+.logo { position:absolute; top:36px; right:60px; height:38px; opacity:0.85; z-index:50; }
 
-  .body {
-    flex: 1;
-    padding: 32px 52px 16px;
-    display: flex; flex-direction: column;
-    overflow: hidden;
-  }
+#nav {
+  position:absolute; bottom:32px; left:50%; transform:translateX(-50%);
+  display:flex; align-items:center; gap:18px; z-index:100;
+}
+.nav-btn {
+  background:var(--surface); border:1px solid rgba(255,255,255,0.12);
+  color:var(--text); width:42px; height:42px; border-radius:50%;
+  font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:background 0.2s, border-color 0.2s;
+}
+.nav-btn:hover { background:var(--surface2); border-color:rgba(240,125,0,0.5); }
+.nav-btn:disabled { opacity:0.2; cursor:default; }
+.nav-dots { display:flex; gap:8px; align-items:center; }
+.dot { width:7px; height:7px; border-radius:50%; background:rgba(255,255,255,0.22); cursor:pointer; transition:background 0.2s, transform 0.2s; }
+.dot.active { background:var(--orange); transform:scale(1.5); }
+#counter { font-size:12px; color:var(--muted); font-family:'JetBrains Mono',monospace; min-width:36px; text-align:center; }
 
-  .nav {
-    height: 38px;
-    display: flex; align-items: center;
-    justify-content: space-between;
-    padding: 0 52px;
-    flex-shrink: 0;
-  }
-  .nav-brand { font-size: 10px; font-weight: bold; }
-  .nav-dots  { display: flex; gap: 6px; align-items: center; }
-  .dot       { width: 6px; height: 6px; border-radius: 50%; border: none; cursor: pointer; transition: all .2s; }
-  .nav-ctr   { font-size: 10px; min-width: 32px; text-align: right; }
-  .nav-arrows{ display: flex; gap: 6px; }
-  .arrow {
-    width: 26px; height: 26px; border-radius: 50%; border: none;
-    cursor: pointer; font-size: 12px;
-    display: flex; align-items: center; justify-content: center;
-    transition: all .15s;
-  }
-  .arrow:hover    { transform: scale(1.12); }
-  .arrow:disabled { opacity: .3; cursor: default; transform: none; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.15} }
 
-  /* ── DARK ── */
-  .dark { background: var(--dark); color: #fff; }
-  .dark .nav            { border-top: 1px solid rgba(255,255,255,.08); }
-  .dark .nav-brand      { color: #fff; }
-  .dark .nav-ctr        { color: rgba(255,255,255,.3); }
-  .dark .dot            { background: rgba(255,255,255,.2); }
-  .dark .dot.on         { background: var(--orange); transform: scale(1.4); }
-  .dark .arrow          { background: rgba(255,255,255,.1); color: #fff; }
-  .dark .arrow:hover    { background: rgba(255,255,255,.2); }
+.eyebrow {
+  display:inline-flex; align-items:center; gap:8px;
+  background:rgba(240,125,0,0.12); border:1px solid rgba(240,125,0,0.38);
+  color:var(--orange); font-size:12px; font-weight:700; letter-spacing:2.5px;
+  text-transform:uppercase; padding:6px 16px; border-radius:100px;
+  margin-bottom:36px; width:fit-content;
+}
+.eyebrow .blink { width:7px; height:7px; border-radius:50%; background:var(--orange); animation:blink 1.5s infinite; }
 
-  /* ── LIGHT ── */
-  .light { background: #fff; color: var(--black); }
-  .light .nav           { border-top: 1px solid var(--light); }
-  .light .nav-brand     { color: var(--purple); }
-  .light .nav-ctr       { color: var(--grey); }
-  .light .dot           { background: var(--light); }
-  .light .dot.on        { background: var(--orange); transform: scale(1.4); }
-  .light .arrow         { background: var(--bg-purple); color: var(--purple); }
-  .light .arrow:hover   { filter: brightness(.93); }
+.grad-text {
+  background:var(--grad);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
 
-  /* ── TYPE ── */
-  .eyebrow { font-size:9px; letter-spacing:2.5px; text-transform:uppercase; color:var(--orange); font-weight:bold; margin-bottom:10px; }
-  .h1      { font-size:32px; font-weight:bold; line-height:1.1; margin-bottom:12px; }
-  .h2      { font-size:20px; font-weight:bold; color:var(--purple); line-height:1.2; }
-  .lead    { font-size:12px; color:rgba(255,255,255,.62); line-height:1.6; max-width:520px; }
-  .muted   { font-size:11px; color:var(--grey); margin-top:3px; }
-  .obar    { width:36px; height:3px; background:var(--orange); margin-bottom:14px; }
+h1.hero-title {
+  font-size:88px; font-weight:700;
+  line-height:1.0; letter-spacing:-3px; margin-bottom:28px;
+}
+.hero-slogan { font-size:22px; color:var(--muted); margin-bottom:48px; line-height:1.5; }
+.hero-slogan strong { color:var(--orange); font-weight:600; }
 
-  /* ── META (title) ── */
-  .meta { display:flex; gap:32px; margin-top:28px; flex-wrap:wrap; }
-  .mi   { display:flex; flex-direction:column; gap:2px; }
-  .ml   { font-size:8px; color:rgba(255,255,255,.38); letter-spacing:2px; text-transform:uppercase; }
-  .mv   { font-size:11px; color:#fff; font-weight:bold; }
+.speaker-card {
+  display:flex; align-items:center; gap:18px;
+  background:var(--surface); border:1px solid rgba(77,29,130,0.45);
+  border-radius:14px; padding:18px 26px; width:fit-content;
+}
+.avatar {
+  width:52px; height:52px; border-radius:50%;
+  background:var(--grad); display:flex; align-items:center; justify-content:center;
+  font-size:16px; font-weight:700; flex-shrink:0;
+}
+.speaker-info strong { display:block; font-size:17px; font-weight:600; }
+.speaker-info span { font-size:13px; color:var(--muted); }
 
-  /* ── GRIDS ── */
-  .g2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-  .g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+h2.stitle {
+  font-size:68px; font-weight:700;
+  line-height:1.0; letter-spacing:-2.5px; margin-bottom:52px;
+}
+.sub { font-size:20px; color:var(--muted); max-width:680px; line-height:1.65; margin-bottom:44px; }
 
-  /* ── CARDS ── */
-  .card {
-    background: var(--bg-purple);
-    border-radius: 3px; padding: 14px;
-    position: relative; overflow: hidden;
-  }
-  .card::before {
-    content:''; position:absolute;
-    top:0; left:0; right:0; height:2px;
-    background: var(--grad);
-  }
-  .card.beige { background: var(--bg-beige); }
-  .card h3    { font-size:11px; font-weight:bold; color:var(--purple); margin-bottom:6px; }
-  .card p     { font-size:11px; color:var(--black); line-height:1.55; }
-  .ci         { font-size:18px; margin-bottom:8px; display:block; }
-  .card ul    { list-style:none; margin-top:4px; }
-  .card li    { font-size:11px; color:var(--black); line-height:1.55; padding-left:11px; position:relative; }
-  .card li::before { content:'›'; color:var(--orange); position:absolute; left:0; font-weight:bold; }
+.cards { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; width:100%; }
+.card {
+  background:var(--surface); border:1px solid rgba(255,255,255,0.07);
+  border-radius:16px; padding:36px 32px; position:relative; overflow:hidden;
+  transition:border-color 0.2s, transform 0.2s;
+}
+.card:hover { border-color:rgba(240,125,0,0.35); transform:translateY(-2px); }
+.card-line { position:absolute; top:0; left:0; right:0; height:2px; background:var(--grad); }
+.card-num { font-family:'JetBrains Mono',monospace; font-size:11px; color:rgba(240,125,0,0.55); letter-spacing:2px; margin-bottom:18px; }
+.card h3 { font-size:22px; font-weight:700; color:var(--text); margin-bottom:12px; letter-spacing:-0.5px; line-height:1.25; }
+.card p { font-size:15px; color:var(--muted); line-height:1.7; }
 
-  /* ── CHANGE LIST ── */
-  .cl    { list-style:none; display:flex; flex-direction:column; gap:7px; }
-  .cl li {
-    display:flex; align-items:flex-start; gap:10px;
-    font-size:11px; color:var(--black); line-height:1.5;
-    background:var(--bg-purple); border-radius:3px;
-    padding:9px 12px; position:relative; overflow:hidden;
-  }
-  .cl li::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--grad); }
-  .cl-num {
-    flex-shrink:0; width:18px; height:18px; border-radius:50%;
-    background:var(--purple); color:#fff;
-    font-size:9px; font-weight:bold;
-    display:flex; align-items:center; justify-content:center;
-    margin-top:1px;
-  }
+.chat-wrap { display:grid; grid-template-columns:280px 1fr; gap:26px; width:100%; max-width:1040px; }
+.task-panel {
+  background:var(--surface); border:1px solid rgba(77,29,130,0.4);
+  border-radius:16px; padding:26px 22px;
+}
+.t-label { font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--orange); margin-bottom:12px; }
+.t-ref {
+  font-family:'JetBrains Mono',monospace; font-size:11px;
+  background:rgba(77,29,130,0.35); border:1px solid rgba(77,29,130,0.6);
+  color:#c4a0ff; padding:4px 11px; border-radius:20px; display:inline-block; margin-bottom:12px;
+}
+.t-title { font-size:15px; font-weight:600; color:var(--text); margin-bottom:14px; line-height:1.35; }
+.assign-row { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+.av-sm {
+  width:32px; height:32px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:700; flex-shrink:0;
+}
+.av-sm.agent { background:rgba(240,125,0,0.18); border:1px solid rgba(240,125,0,0.5); color:var(--orange); }
+.av-sm.human { background:rgba(77,29,130,0.5); border:1px solid rgba(77,29,130,0.8); }
+.assign-info strong { display:block; font-size:13px; color:var(--text); }
+.assign-info small { font-size:12px; color:var(--muted); }
+.status-pill {
+  display:inline-block; padding:5px 13px; border-radius:20px;
+  font-size:11px; font-weight:700;
+  background:rgba(240,125,0,0.18); border:1px solid rgba(240,125,0,0.4); color:var(--orange);
+}
+.chat-panel {
+  background:var(--surface); border:1px solid rgba(255,255,255,0.07);
+  border-radius:16px; overflow:hidden; display:flex; flex-direction:column;
+}
+.chat-hdr {
+  background:var(--surface2); padding:15px 22px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  display:flex; align-items:center; gap:10px;
+  font-size:12px; color:var(--muted); font-family:'JetBrains Mono',monospace;
+}
+.pdot { width:8px; height:8px; border-radius:50%; background:var(--orange); animation:blink 2s infinite; }
+.chat-body { padding:22px; display:flex; flex-direction:column; gap:16px; }
+.msg { display:flex; gap:12px; align-items:flex-start; }
+.msg-inner { flex:1; }
+.msg-name { font-size:11px; font-weight:700; color:var(--muted); margin-bottom:5px; letter-spacing:0.5px; }
+.badge {
+  display:inline-block; margin-left:5px; font-size:10px;
+  padding:1px 7px; border-radius:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+}
+.badge.agent { background:rgba(240,125,0,0.18); color:var(--orange); border:1px solid rgba(240,125,0,0.4); }
+.badge.human { background:rgba(77,29,130,0.3); color:#c4a0ff; border:1px solid rgba(77,29,130,0.5); }
+.msg-bubble {
+  background:var(--surface2); border-radius:11px; padding:13px 17px;
+  font-size:14px; line-height:1.65; color:var(--text);
+  border:1px solid rgba(255,255,255,0.05); max-width:580px;
+}
+.msg-bubble.agent { border-left:2px solid var(--orange); }
+.msg-bubble code {
+  font-family:'JetBrains Mono',monospace; font-size:12px;
+  background:rgba(0,0,0,0.3); padding:2px 6px; border-radius:4px; color:#f4b860;
+}
 
-  /* ── INFO BOX ── */
-  .info { background:var(--purple); border-radius:3px; padding:12px 16px; margin-bottom:12px; }
-  .info .lbl { font-size:8px; text-transform:uppercase; letter-spacing:2px; color:var(--orange); font-weight:bold; margin-bottom:5px; }
-  .info p    { font-size:11px; line-height:1.6; color:rgba(255,255,255,.88); }
+.stack-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; width:100%; }
+.stack-item {
+  background:var(--surface); border:1px solid rgba(255,255,255,0.07);
+  border-radius:14px; padding:36px 24px; text-align:center; transition:border-color 0.2s;
+}
+.stack-item:hover { border-color:rgba(240,125,0,0.35); }
+.stack-icon { font-size:38px; margin-bottom:14px; display:block; }
+.stack-name { font-size:17px; font-weight:700; color:var(--text); margin-bottom:7px; }
+.stack-desc { font-size:13px; color:var(--muted); line-height:1.55; }
 
-  /* ── NOTE ── */
-  .note { background:var(--bg-beige); border-left:3px solid var(--orange); padding:9px 12px; font-size:10px; line-height:1.6; border-radius:0 3px 3px 0; color:var(--black); }
-  .note strong { color:var(--purple); }
-
-  /* ── TABLES ── */
-  table  { width:100%; border-collapse:collapse; font-size:10px; }
-  thead tr { background:var(--purple); color:#fff; }
-  th     { padding:7px 10px; text-align:left; font-size:9px; text-transform:uppercase; letter-spacing:1px; }
-  td     { padding:7px 10px; border-bottom:1px solid var(--light); vertical-align:top; line-height:1.45; }
-  tr:nth-child(even) td { background:var(--bg-purple); }
-  .tag   { display:inline-block; font-size:8px; font-weight:bold; letter-spacing:1px; text-transform:uppercase; padding:1px 5px; border-radius:2px; }
-  .ti    { background:var(--orange); color:#fff; }
-  .td    { background:var(--purple); color:#fff; }
-
-  /* HUKI */
-  .hrow td { background:var(--bg-beige)!important; font-weight:bold; color:var(--purple); font-size:8px; letter-spacing:1px; text-transform:uppercase; padding:4px 10px; }
-  th.c, td.c { text-align:center; width:80px; }
-  .badge { display:inline-flex; width:18px; height:18px; border-radius:50%; font-weight:bold; font-size:9px; align-items:center; justify-content:center; }
-  .bH { background:var(--purple); color:#fff; }
-  .bU { background:var(--orange); color:#fff; }
-  .bK { background:var(--bg-purple); color:var(--purple); border:1px solid var(--purple); }
-  .bI { background:var(--light); color:var(--grey); }
-  .bN { color:var(--light); font-size:13px; }
-
-  /* ── TIMELINE ── */
-  .tl { display:flex; align-items:flex-start; position:relative; margin-top:10px; }
-  .tl::before { content:''; position:absolute; top:14px; left:14px; right:14px; height:2px; background:var(--grad); }
-  .ti2  { flex:1; display:flex; flex-direction:column; align-items:center; gap:7px; position:relative; z-index:1; }
-  .tdot { width:28px; height:28px; border-radius:50%; background:var(--purple); border:2px solid #fff; box-shadow:0 0 0 2px var(--purple); display:flex; align-items:center; justify-content:center; font-size:11px; }
-  .tdot.o { background:var(--orange); box-shadow:0 0 0 2px var(--orange); }
-  .tc   { text-align:center; }
-  .tdate{ font-size:8px; font-weight:bold; color:var(--orange); text-transform:uppercase; letter-spacing:1px; margin-bottom:2px; }
-  .ttl  { font-size:10px; font-weight:bold; color:var(--black); }
-  .tsub { font-size:9px; color:var(--grey); margin-top:1px; }
-
-  /* ── SLA ── */
-  .sla-g { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-  .sla-b { border:2px solid var(--bg-purple); border-radius:3px; padding:12px; }
-  .sla-b.p{ border-color:var(--purple); background:var(--bg-purple); }
-  .sla-l { font-size:8px; text-transform:uppercase; letter-spacing:2px; font-weight:bold; color:var(--grey); margin-bottom:4px; }
-  .sla-c { font-size:30px; font-weight:bold; color:var(--purple); line-height:1; }
-  .sla-c.o{ color:var(--orange); }
-  .sla-d { font-size:10px; color:var(--black); margin-top:5px; line-height:1.4; }
-  .sla-o { margin-top:6px; font-size:9px; color:var(--orange); font-weight:bold; }
+.big-quote {
+  background:var(--surface); border-radius:20px;
+  padding:64px 72px; border-left:5px solid var(--orange); max-width:1000px;
+}
+.big-quote blockquote {
+  font-size:50px; font-weight:700;
+  line-height:1.2; letter-spacing:-2px; color:var(--text); margin-bottom:24px;
+}
+.big-quote cite { font-size:14px; color:var(--orange); font-style:normal; font-weight:600; letter-spacing:1.5px; }
 </style>
 </head>
 <body>
-<div id="stage">
 
-<!-- SLIDE 1: TITTEL -->
-<div class="slide dark active">
-  <div class="bar"></div>
-  <div class="body" style="justify-content:center;">
-    <div style="position:absolute;top:22px;right:52px;text-align:right;">
-      <div style="font-size:13px;font-weight:bold;color:#fff;">Sopra Steria</div>
-      <div style="font-size:8px;color:rgba(255,255,255,.38);letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;">The world is how we shape it.</div>
+<div id="deck"><div id="scaler">
+<div id="progress"></div>
+<img class="logo" src="data:image/png;base64,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" alt="Sopra Steria">
+
+<div id="deck">
+
+<!-- SLIDE 1: HERO -->
+<div class="slide active" id="s1">
+  <div class="eyebrow"><span class="blink"></span>The AI Show · 2026</div>
+  <h1 class="hero-title">Multica –<br>mennesker og agenter<br><span class="grad-text">settes i system</span></h1>
+  <p class="hero-slogan"><strong>"Your next 10 hires won't be human"</strong><br>– men hvordan ser det ut i praksis?</p>
+  <div class="speaker-card">
+    <div class="avatar">EK</div>
+    <div class="speaker-info">
+      <strong>Eirik Kvernmo Holgernes</strong>
+      <span>Business Owner, Cloud Native · Sopra Steria</span>
     </div>
-    <div class="eyebrow">Tilbud til Bane NOR · 2026</div>
-    <div class="h1">Plattformtjeneste for<br>Utvikler- og<br>Integrasjonsplattform</div>
-    <div class="lead">Helhetlig drift og vedlikehold av Bane NORs strategiske plattformer – levert som tjeneste under IKT Driftsavtale.</div>
-    <div class="meta">
-      <div class="mi"><div class="ml">Oppstart</div><div class="mv">01.09.2026</div></div>
-      <div class="mi"><div class="ml">Varighet</div><div class="mv">1 år + opsjon 1+1</div></div>
-      <div class="mi"><div class="ml">Avtaleform</div><div class="mv">Endringsordre på IKT Driftsavtale</div></div>
-      <div class="mi"><div class="ml">Leverandør</div><div class="mv">Sopra Steria AS</div></div>
-    </div>
-  </div>
-  <div class="nav">
-    <span class="nav-brand">Sopra Steria</span>
-    <div class="nav-dots"></div>
-    <span class="nav-ctr"></span>
-    <div class="nav-arrows"><button class="arrow prev">←</button><button class="arrow next">→</button></div>
   </div>
 </div>
 
-<!-- SLIDE 2: EXECUTIVE SUMMARY -->
-<div class="slide dark">
-  <div class="bar"></div>
-  <div class="body" style="justify-content:center;">
-    <div class="eyebrow">Executive Summary</div>
-    <div style="font-size:18px;font-weight:bold;color:#fff;line-height:1.2;margin-bottom:20px;max-width:700px;">
-      Fra konsulentkjøp til tjeneste – samme team, ny avtaleform
+<!-- SLIDE 2: HVA ER MULTICA -->
+<div class="slide" id="s2">
+  <div class="eyebrow">Hva er Multica?</div>
+  <h2 class="stitle">Agenter som<br><span class="grad-text">ekte kolleger</span></h2>
+  <div class="cards">
+    <div class="card">
+      <div class="card-line"></div>
+      <div class="card-num">01 // ARBEIDSFLATE</div>
+      <h3>Én felles tavle for alle</h3>
+      <p>Mennesker og AI-agenter jobber side om side i samme prosjekttavle. Tildel en task til en agent akkurat som til en kollega – agenten henter jobben, skriver kode og oppdaterer status.</p>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;">
-      <div style="background:rgba(255,255,255,0.95);border-radius:3px;padding:16px;border-top:3px solid var(--orange);">
-        <div style="font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--orange);font-weight:bold;margin-bottom:8px;">Bakgrunn</div>
-        <p style="font-size:11px;color:var(--black);line-height:1.6;">Sopra Steria har i flere år levert plattformene som konsulenttjenester. Bane NOR vil kjøpe dette som en tjeneste over IKT Driftsavtale.</p>
-      </div>
-      <div style="background:rgba(255,255,255,0.95);border-radius:3px;padding:16px;border-top:3px solid var(--orange);">
-        <div style="font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--orange);font-weight:bold;margin-bottom:8px;">Leveransen</div>
-        <p style="font-size:11px;color:var(--black);line-height:1.6;">To dedikerte team – ett per plattform – med helhetlig ansvar for drift, vedlikehold og avtalt videreutvikling. Inkluderer teamlead, techlead, security champion og plattformingeniører per plattform.</p>
-      </div>
-      <div style="background:rgba(255,255,255,0.95);border-radius:3px;padding:16px;border-top:3px solid var(--orange);">
-        <div style="font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--orange);font-weight:bold;margin-bottom:8px;">Rammer</div>
-        <p style="font-size:11px;color:var(--black);line-height:1.6;">Oppstart 01.09.2026. Varighet 1 år med opsjon 1+1. SLA klasse D (standard arbeidstid) med 24/7 som opsjon. Endringsordre på IKT Driftsavtale.</p>
-      </div>
-      <div style="background:rgba(255,255,255,0.95);border-radius:3px;padding:16px;border-top:3px solid var(--orange);">
-        <div style="font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--orange);font-weight:bold;margin-bottom:8px;">Hvorfor Sopra Steria</div>
-        <p style="font-size:11px;color:var(--black);line-height:1.6;">Kjenner plattformene fra dag én. Trygg overgang uten kompetansetap. Proaktiv tilnærming – foreslår forbedringer fremfor kun å reagere på hendelser.</p>
-      </div>
+    <div class="card">
+      <div class="card-line"></div>
+      <div class="card-num">02 // KOMMUNIKASJON</div>
+      <h3>Snakk med agentene dine</h3>
+      <p>Kommenter tasks, stil spørsmål, gi feedback – agentene svarer i samme tråd som kollegene dine. Aktivitetsfeeden viser mennesker og agenter jobbe side om side i sanntid.</p>
     </div>
-  </div>
-  <div class="nav">
-    <span class="nav-brand">Sopra Steria</span>
-    <div class="nav-dots"></div>
-    <span class="nav-ctr"></span>
-    <div class="nav-arrows"><button class="arrow prev">←</button><button class="arrow next">→</button></div>
+    <div class="card">
+      <div class="card-line"></div>
+      <div class="card-num">03 // INFRASTRUKTUR</div>
+      <h3>Open source · Kubernetes · Overalt</h3>
+      <p>Kjør på din egen infrastruktur – Docker Compose eller Kubernetes. Koden forlater aldri nettverket ditt. Fullt revisjonsbart og særlig relevant for regulerte bransjer.</p>
+    </div>
   </div>
 </div>
 
-<!-- SLIDE 3: BAKGRUNN -->
-<div class="slide light">
-  <div class="bar"></div>
-  <div class="body">
-    <div class="obar"></div>
-    <div class="h2">Bakgrunn</div>
-    <div class="muted" style="margin-bottom:14px;">Hvorfor Bane NOR ønsker en ny leveransemodell</div>
-    <div class="info">
-      <div class="lbl">Situasjonen i dag</div>
-      <p>Sopra Steria har i flere år levert plattformene som konsulenttjenester under driftsavtalen. Bane NOR vil kjøpe dette som en tjeneste over IKT Driftsavtale.</p>
-    </div>
-    <div class="g2">
-      <div class="card beige"><span class="ci">📋</span><h3>Forutsigbar leveranse</h3><p>Fast tjeneste gir bedre kostnadskontroll og tydeligere ansvar enn timebasert konsulentbruk.</p></div>
-      <div class="card"><span class="ci">🤝</span><h3>Kjent leverandør</h3><p>Sopra Steria kjenner plattformene godt og sikrer trygg overgang til ny leveransemodell.</p></div>
-    </div>
-  </div>
-  <div class="nav">
-    <span class="nav-brand">Sopra Steria</span>
-    <div class="nav-dots"></div>
-    <span class="nav-ctr"></span>
-    <div class="nav-arrows"><button class="arrow prev">←</button><button class="arrow next">→</button></div>
-  </div>
-</div>
-
-<!-- SLIDE 3: PLATTFORMENE -->
-<div class="slide light">
-  <div class="bar"></div>
-  <div class="body">
-    <div class="obar"></div>
-    <div class="h2">To strategiske plattformer</div>
-    <div class="muted" style="margin-bottom:14px;">Sentrale i Bane NORs referansearkitektur</div>
-    <div class="g2" style="flex:1;">
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        <div style="margin-bottom:2px;"><span class="tag ti" style="padding:3px 9px;font-size:10px;">Integrasjonsplattform</span></div>
-        <div class="card" style="flex:1;"><h3>Komponenter</h3><ul><li>Azure API Management</li><li>Confluent Kafka</li><li>Event Issuer &amp; Payload Manager</li><li>HiveMQ</li><li>Azure Kubernetes Service (AKS)</li></ul></div>
-        <div class="card beige" style="flex:1;"><h3>Status</h3><ul><li>Aktiv videreutvikling pågår</li><li>OT/KV-komponenter etableres OnPrem</li><li>Vil kunne få behov for 24/7 fremover</li></ul></div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        <div style="margin-bottom:2px;"><span class="tag td" style="padding:3px 9px;font-size:10px;">Utviklerplattform (Bullet)</span></div>
-        <div class="card" style="flex:1;"><h3>Komponenter</h3><ul><li>Azure Kubernetes Services (AKS)</li><li>Felles rammeverk og verktøy</li><li>Standardiserte sikkerhetsløsninger</li><li>GitHub CI/CD-pipelines</li></ul></div>
-        <div class="card beige" style="flex:1;"><h3>Status</h3><ul><li>I stor grad over i ren drift</li><li>Ingen 24/7-behov i dag</li><li>Kjøretidsmiljø for interne applikasjoner</li></ul></div>
-      </div>
-    </div>
-  </div>
-  <div class="nav">
-    <span class="nav-brand">Sopra Steria</span>
-    <div class="nav-dots"></div>
-    <span class="nav-ctr"></span>
-    <div class="nav-arrows"><button class="arrow prev">←</button><button class="arrow next">→</button></div>
-  </div>
-</div>
-
-<!-- SLIDE 4: OMFANG -->
-<div class="slide light">
-  <div class="bar"></div>
-  <div class="body">
-    <div class="obar"></div>
-    <div class="h2">Omfang og leveranser</div>
-    <div class="muted" style="margin-bottom:14px;">Tre leveranseområder – proaktivt og helhetlig</div>
-    <div class="g3" style="margin-bottom:10px;">
-      <div class="card"><span class="ci">⚙️</span><h3>Drift</h3><ul><li>Overvåking og administrasjon</li><li>Brukerstøtte og onboarding</li><li>Implementering av sikkerhetstiltak</li><li>Incident response</li><li>Administrasjon av kjøretidsmiljø</li></ul></div>
-      <div class="card beige"><span class="ci">🔧</span><h3>Vedlikehold</h3><ul><li>Feilretting og patching</li><li>Versjonskontroll og oppgraderinger</li><li>Dokumentasjon og sporbarhet</li><li>Kostnadsoptimalisering</li><li>Automatisering og selvbetjening</li></ul></div>
-      <div class="card"><span class="ci">🚀</span><h3>Avtalt videreutvikling</h3><ul><li>Proaktive forbedringsforslag</li><li>Kubernetes-skalering</li><li>Godkjente videreutviklingsoppgaver</li><li>Månedlig brukerforum og demo</li><li>Support via Teams (arbeidstid)</li></ul></div>
-    </div>
-    <div class="note"><strong>Endringsordrer:</strong> Nye behov utenfor avtalens scope meldes som endringsordrer og behandles som forvaltningsoppgaver.</div>
-  </div>
-  <div class="nav">
-    <span class="nav-brand">Sopra Steria</span>
-    <div class="nav-dots"></div>
-    <span class="nav-ctr"></span>
-    <div class="nav-arrows"><button class="arrow prev">←</button><button class="arrow next">→</button></div>
-  </div>
-</div>
-
-<!-- SLIDE 5: ROLLER -->
-<div class="slide light">
-  <div class="bar"></div>
-  <div class="body">
-    <div class="obar"></div>
-    <div class="h2">Roller og teamorganisering</div>
-    <div class="muted" style="margin-bottom:12px;">To dedikerte team – ett per plattform</div>
-    <table style="margin-bottom:10px;">
-      <thead><tr><th>Plattform</th><th>Rolle</th><th>Ansvarsområde</th></tr></thead>
-      <tbody>
-        <tr><td><span class="tag ti">Integrasjon</span></td><td><strong>Teamlead</strong></td><td>Leder teamet, kontaktpunkt mot BN, sikrer prioritering og fremdrift.</td></tr>
-        <tr><td><span class="tag ti">Integrasjon</span></td><td><strong>Techlead</strong></td><td>Teknisk ansvarlig, leder teknologivalg og arkitektur.</td></tr>
-        <tr><td><span class="tag ti">Integrasjon</span></td><td><strong>Plattformingeniør</strong></td><td>Utfører drift, overvåking, feilretting, patching og videreutvikling.</td></tr>
-        <tr><td><span class="tag ti">Integrasjon</span></td><td><strong>Security Champion</strong></td><td>Innhenter og implementerer krav fra Digital Sikkerhet.</td></tr>
-        <tr><td><span class="tag td">Utvikler</span></td><td><strong>Teamlead</strong></td><td>Leder teamet, kontaktpunkt mot BN, sikrer prioritering og fremdrift.</td></tr>
-        <tr><td><span class="tag td">Utvikler</span></td><td><strong>Techlead</strong></td><td>Teknisk ansvarlig, leder teknologivalg og arkitektur.</td></tr>
-        <tr><td><span class="tag td">Utvikler</span></td><td><strong>Plattformingeniør</strong></td><td>Utfører drift, automatisering, standardisering og teknisk onboarding.</td></tr>
-        <tr><td><span class="tag td">Utvikler</span></td><td><strong>Security Champion</strong></td><td>Innhenter og implementerer krav fra Digital Sikkerhet.</td></tr>
-      </tbody>
-    </table>
-    <div class="g2">
-      <div class="card" style="padding:10px;"><h3>Bane NOR anbefales å stille med</h3><p style="margin-top:3px;"><strong>Tjenesteeier</strong> per plattform (BNs interne rollebetegnelse). Tjenesteeier prioriterer leveranser, avklarer hvilke oppgaver teamet skal arbeide med, og fungerer som brobygger mellom tjenesteteamenes behov og plattformtjenesten. Uten en aktiv Tjenesteeier vil evnen til å prioritere arbeid og sikre god adopsjon i tjenesteteamene svekkes.</p></div>
-      <div class="card beige" style="padding:10px;"><h3>Arbeidssted</h3><p style="margin-top:3px;">Teamleads og techleads arbeider fra Bane NORs lokaler der det er hensiktsmessig.</p></div>
-    </div>
-  </div>
-  <div class="nav">
-    <span class="nav-brand">Sopra Steria</span>
-    <div class="nav-dots"></div>
-    <span class="nav-ctr"></span>
-    <div class="nav-arrows"><button class="arrow prev">←</button><button class="arrow next">→</button></div>
-  </div>
-</div>
-
-<!-- SLIDE 6: HUKI -->
-<div class="slide light">
-  <div class="bar"></div>
-  <div class="body">
-    <div class="obar"></div>
-    <div class="h2">Ansvarsfordeling (HUKI)</div>
-    <div class="muted" style="margin-bottom:10px;">* Reguleres av IKT Driftsavtalen</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;flex:1;overflow:hidden;">
-
-      <!-- VENSTRE: Drift, vedlikehold, videreutvikling -->
-      <div>
-        <table style="font-size:10px;width:100%;">
-          <thead><tr><th style="padding:5px 8px;">Ansvarsområde</th><th class="c" style="padding:5px 8px;width:70px;">2S</th><th class="c" style="padding:5px 8px;width:70px;">BN</th></tr></thead>
-          <tbody>
-            <tr class="hrow"><td colspan="3">Drift og overvåking</td></tr>
-            <tr><td style="padding:4px 8px;">Overvåking og alarmer</td><td class="c"><span class="badge bH">H</span></td><td class="c"><span class="badge bI">I</span></td></tr>
-            <tr><td style="padding:4px 8px;">Incident response – plattformfeil</td><td class="c"><span class="badge bH">H</span></td><td class="c"><span class="badge bK">K</span></td></tr>
-            <tr><td style="padding:4px 8px;">Incident response – applikasjonsfeil</td><td class="c"><span class="badge bI">I</span></td><td class="c"><span class="badge bH">H</span></td></tr>
-            <tr class="hrow"><td colspan="3">Vedlikehold</td></tr>
-            <tr><td style="padding:4px 8px;">Patching og versjonshåndtering</td><td class="c"><span class="badge bH">H</span></td><td class="c"><span class="badge bK">K</span></td></tr>
-            <tr><td style="padding:4px 8px;">Kubernetes-konfigurasjon og skalering</td><td class="c"><span class="badge bH">H</span></td><td class="c"><span class="badge bK">K</span></td></tr>
-            <tr><td style="padding:4px 8px;">Implementering av sikkerhetskrav</td><td class="c"><span class="badge bH">H</span></td><td class="c"><span class="badge bK">K</span></td></tr>
-            <tr class="hrow"><td colspan="3">Avtalt videreutvikling</td></tr>
-            <tr><td style="padding:4px 8px;">Foreslå forbedringer</td><td class="c"><span class="badge bH">H</span></td><td class="c"><span class="badge bI">I</span></td></tr>
-            <tr><td style="padding:4px 8px;">Prioritering av backlog</td><td class="c"><span class="badge bU">U</span></td><td class="c"><span class="badge bH">H</span></td></tr>
-            <tr><td style="padding:4px 8px;">Gjennomføring av godkjente oppgaver</td><td class="c"><span class="badge bH">H</span></td><td class="c"><span class="badge bK">K</span></td></tr>
-            <tr><td style="padding:4px 8px;">Koordinering mot forretning og strategi</td><td class="c"><span class="badge bI">I</span></td><td class="c"><span class="badge bH">H</span></td></tr>
-            <tr><td style="padding:4px 8px;">Utarbeidelse av målbilde og gevinster</td><td class="c"><span class="badge bK">K</span></td><td class="c"><span class="badge bH">H</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- HØYRE: Brukerstøtte + avgrensninger -->
-      <div>
-        <table style="font-size:10px;width:100%;">
-          <thead><tr><th style="padding:5px 8px;">Ansvarsområde</th><th class="c" style="padding:5px 8px;width:70px;">2S</th><th class="c" style="padding:5px 8px;width:70px;">BN</th></tr></thead>
-          <tbody>
-            <tr class="hrow"><td colspan="3">Brukerstøtte og onboarding</td></tr>
-            <tr><td style="padding:4px 8px;">Onboarding av tjenesteteam</td><td class="c"><span class="badge bH">H</span></td><td class="c"><span class="badge bK">K</span></td></tr>
-            <tr><td style="padding:4px 8px;">Brukerstøtte via Teams (arbeidstid)</td><td class="c"><span class="badge bH">H</span></td><td class="c"><span class="badge bI">I</span></td></tr>
-            <tr><td style="padding:4px 8px;">Månedlig brukerforum / demo</td><td class="c"><span class="badge bH">H</span></td><td class="c"><span class="badge bK">K</span></td></tr>
-            <tr class="hrow"><td colspan="3">Avgrensninger *</td></tr>
-            <tr><td style="padding:4px 8px;">Applikasjonsforvaltning (tjenesteteam)</td><td class="c"><span class="badge bN">—</span></td><td class="c"><span class="badge bH">H</span></td></tr>
-            <tr><td style="padding:4px 8px;">Identitetshåndtering (IAM)</td><td class="c"><span class="badge bN">—</span></td><td class="c"><span class="badge bH">H</span></td></tr>
-            <tr><td style="padding:4px 8px;">Nettverksinfrastruktur og brannmur</td><td class="c"><span class="badge bH">H</span></td><td class="c"><span class="badge bN">—</span></td></tr>
-            <tr><td style="padding:4px 8px;">Azure-abonnement og lisenskostnader</td><td class="c"><span class="badge bN">—</span></td><td class="c"><span class="badge bH">H</span></td></tr>
-          </tbody>
-        </table>
-        <div style="margin-top:14px;display:flex;gap:10px;font-size:9px;color:var(--grey);align-items:center;flex-wrap:wrap;">
-          <span><span class="badge bH" style="width:15px;height:15px;font-size:8px;">H</span> Har ansvar</span>
-          <span><span class="badge bU" style="width:15px;height:15px;font-size:8px;">U</span> Understøtter</span>
-          <span><span class="badge bK" style="width:15px;height:15px;font-size:8px;">K</span> Kontrollerer</span>
-          <span><span class="badge bI" style="width:15px;height:15px;font-size:8px;">I</span> Informeres</span>
-          <span><span class="badge bN" style="width:15px;height:15px;">—</span> Ikke involvert</span>
+<!-- SLIDE 3: CHAT DEMO -->
+<div class="slide" id="s3">
+  <div class="eyebrow">Se det i praksis</div>
+  <h2 class="stitle">Samme workflow.<br><span class="grad-text">Ikke alle er mennesker.</span></h2>
+  <div class="chat-wrap">
+    <div class="task-panel">
+      <div class="t-label">Aktiv task</div>
+      <div class="t-ref">MUL-42</div>
+      <div class="t-title">Refactor API error handling middleware</div>
+      <div class="assign-row">
+        <div class="av-sm agent">AI</div>
+        <div class="assign-info">
+          <strong>claude-agent-01</strong>
+          <small>Agent · In progress</small>
         </div>
       </div>
-
+      <div class="status-pill">● In progress</div>
     </div>
-  </div>
-  <div class="nav">
-    <span class="nav-brand">Sopra Steria</span>
-    <div class="nav-dots"></div>
-    <span class="nav-ctr"></span>
-    <div class="nav-arrows"><button class="arrow prev">←</button><button class="arrow next">→</button></div>
-  </div>
-</div>
-
-<!-- SLIDE 7: SLA OG VARIGHET -->
-<div class="slide light">
-  <div class="bar"></div>
-  <div class="body">
-    <div class="obar"></div>
-    <div class="h2">SLA og avtalevarighet</div>
-    <div class="muted" style="margin-bottom:14px;">Klare rammer og fleksibilitet for fremtiden</div>
-    <div class="g2" style="gap:40px;flex:1;">
-      <div>
-        <div style="font-size:11px;font-weight:bold;color:var(--purple);margin-bottom:10px;">SLA-klassifisering</div>
-        <div class="sla-g">
-          <div class="sla-b p">
-            <div class="sla-l">Standard – Klasse D</div>
-            <div class="sla-c">D</div>
-            <div class="sla-d">Ordinær arbeidstid 08–16, mandag–fredag, ekskl. helligdager. Iht. IKT Driftsavtale.</div>
-          </div>
-          <div class="sla-b">
-            <div class="sla-l">Tillegg – Klasse B</div>
-            <div class="sla-c o">B</div>
-            <div class="sla-d">Utvidet beredskap bestilles ved behov for definerte perioder. Forutsetter aktiv standard dagtjeneste.</div>
-            <div class="sla-o">⊕ Bestilles separat</div>
+    <div class="chat-panel">
+      <div class="chat-hdr">
+        <div class="pdot"></div>
+        <span>task activity · MUL-42</span>
+      </div>
+      <div class="chat-body">
+        <div class="msg">
+          <div class="av-sm human">EK</div>
+          <div class="msg-inner">
+            <div class="msg-name">Eirik Kvernmo <span class="badge human">Human</span></div>
+            <div class="msg-bubble">Kan du ta denne? Behold eksisterende HTTP-statuskoder – frontend avhenger av spesifikke koder som <code>409</code>.</div>
           </div>
         </div>
-        <div class="note" style="margin-top:10px;"><strong>Merk:</strong> Klasse B er et midlertidig tillegg til standard dagtjeneste – ikke en frittstående tjeneste. Ved ønske om økt klassifisering og 24/7 må fast beredskap bestilles.</div>
-      </div>
-      <div>
-        <div style="font-size:11px;font-weight:bold;color:var(--purple);margin-bottom:10px;">Avtaleperiode</div>
-        <div class="tl">
-          <div class="ti2"><div class="tdot">📋</div><div class="tc"><div class="tdate">Q2 2026</div><div class="ttl">Avtaleinngåelse</div><div class="tsub">Signering</div></div></div>
-          <div class="ti2"><div class="tdot o">🚀</div><div class="tc"><div class="tdate">01.09.2026</div><div class="ttl">Oppstart</div><div class="tsub">Tjenesten aktiv</div></div></div>
-          <div class="ti2"><div class="tdot">📅</div><div class="tc"><div class="tdate">01.09.2027</div><div class="ttl">År 1 ferdig</div><div class="tsub">Opsjon +1 år</div></div></div>
-          <div class="ti2"><div class="tdot">🔁</div><div class="tc"><div class="tdate">01.09.2029</div><div class="ttl">Maks varighet</div><div class="tsub">1+1+1 år</div></div></div>
+        <div class="msg">
+          <div class="av-sm agent">AI</div>
+          <div class="msg-inner">
+            <div class="msg-name">claude-agent-01 <span class="badge agent">Agent</span></div>
+            <div class="msg-bubble agent">Ferdig. Har standardisert feilresponsene på tvers av 14 handlere. Alle HTTP-statuskoder er bevart. PR #43 er klar for review.</div>
+          </div>
         </div>
-        <div class="card" style="margin-top:18px;padding:11px;">
-          <h3>Overgangsperiode</h3>
-          <p style="margin-top:3px;">BN har bestilt utvidet konsulentkjøp frem til september 2026 – sikrer kontinuitet frem til ny avtale trer i kraft.</p>
+        <div class="msg">
+          <div class="av-sm human">EK</div>
+          <div class="msg-inner">
+            <div class="msg-name">Eirik Kvernmo <span class="badge human">Human</span></div>
+            <div class="msg-bubble">Ser bra ut. Merge når CI er grønn.</div>
+          </div>
         </div>
       </div>
     </div>
   </div>
-  <div class="nav">
-    <span class="nav-brand">Sopra Steria</span>
-    <div class="nav-dots"></div>
-    <span class="nav-ctr"></span>
-    <div class="nav-arrows"><button class="arrow prev">←</button><button class="arrow next">→</button></div>
+</div>
+
+<!-- SLIDE 4: TECH STACK -->
+<div class="slide" id="s4">
+  <div class="eyebrow">Tech &amp; kompatibilitet</div>
+  <h2 class="stitle">Vendor-nøytralt<br><span class="grad-text">fra dag én</span></h2>
+  <div class="stack-grid">
+    <div class="stack-item">
+      <span class="stack-icon">⚙️</span>
+      <div class="stack-name">Kubernetes</div>
+      <div class="stack-desc">Self-host overalt. On-prem, Azure, AWS, GCP – dine regler.</div>
+    </div>
+    <div class="stack-item">
+      <span class="stack-icon">🔓</span>
+      <div class="stack-name">Open Source</div>
+      <div class="stack-desc">Fullt revisjonsbart. Ingen data forlater nettverket ditt.</div>
+    </div>
+    <div class="stack-item">
+      <span class="stack-icon">🤖</span>
+      <div class="stack-name">11 agent-backends</div>
+      <div class="stack-desc">Claude Code, Codex, Cursor, Copilot, Gemini og flere.</div>
+    </div>
+    <div class="stack-item">
+      <span class="stack-icon">🏦</span>
+      <div class="stack-name">Regulerte bransjer</div>
+      <div class="stack-desc">Finans, helse, offentlig sektor – data forlater ikke nettverket.</div>
+    </div>
   </div>
 </div>
 
-<!-- SLIDE 8: VIKTIGSTE ENDRINGER -->
-<div class="slide light">
-  <div class="bar"></div>
-  <div class="body">
-    <div class="obar"></div>
-    <div class="h2">Viktigste endringer fra opprinnelig forslag</div>
-    <div class="muted" style="margin-bottom:14px;">Fra Bane NORs første utkast til nåværende versjon</div>
-    <ul class="cl">
-      <li><div class="cl-num">1</div><div><strong>Teknologinøytrale formuleringer</strong> — Navngitte produkter erstattet med agnostiske beskrivelser for å håndtere fremtidige teknologiskifter.</div></li>
-      <li><div class="cl-num">2</div><div><strong>To separate team</strong> — Eksplisitt oppdelt i ett team per plattform, med egne roller og kompetansekrav.</div></li>
-      <li><div class="cl-num">3</div><div><strong>Plattformingeniør som egen rolle</strong> — Presisert at tekniske ressurser ikke er dekket av teamlead/techlead-rollene.</div></li>
-      <li><div class="cl-num">4</div><div><strong>HUKI-matrise</strong> — Tydeliggjør ansvarsfordeling og avgrenser hva som reguleres av IKT-driftsavtalen.</div></li>
-      <li><div class="cl-num">5</div><div><strong>24/7 som opsjon</strong> — Fjernet som standard, lagt inn som valgfri opsjon (klasse B) – særlig aktuelt for integrasjonsplattformen.</div></li>
-      <li><div class="cl-num">6</div><div><strong>SLA endret fra klasse B til D</strong> — Riktig klassifisering for ordinær arbeidstid som grunnlinje.</div></li>
-      <li><div class="cl-num">7</div><div><strong>Avtaleform korrigert</strong> — Endringsordre på eksisterende avtale (ikke ny SSA-D).</div></li>
-      <li><div class="cl-num">8</div><div><strong>Detaljerte kompetansekrav</strong> — Ny seksjon med felles og plattformspesifikke krav, inkl. krav til kontinuitet og rådgivningsevne.</div></li>
-    </ul>
-  </div>
-  <div class="nav">
-    <span class="nav-brand">Sopra Steria</span>
-    <div class="nav-dots"></div>
-    <span class="nav-ctr"></span>
-    <div class="nav-arrows"><button class="arrow prev">←</button><button class="arrow next">→</button></div>
+<!-- SLIDE 5: QUOTE -->
+<div class="slide" id="s5">
+  <div class="eyebrow">Poenget</div>
+  <div class="big-quote">
+    <blockquote>"To utviklere og en flåte<br>av agenter kan bevege seg<br><span class="grad-text">som tjue."</span></blockquote>
+    <cite>MULTICA.AI</cite>
   </div>
 </div>
 
-</div><!-- /stage -->
+<!-- NAV -->
+<div id="nav">
+  <button class="nav-btn" id="btn-prev" onclick="changeSlide(-1)" disabled>&#8592;</button>
+  <div class="nav-dots" id="dots"></div>
+  <button class="nav-btn" id="btn-next" onclick="changeSlide(1)">&#8594;</button>
+  <span id="counter">1 / 5</span>
+</div>
+
+</div><!-- /deck -->
+</div><!-- /scaler -->
 
 <script>
-  const stage  = document.getElementById('stage');
-  const slides = Array.from(document.querySelectorAll('.slide'));
-  const total  = slides.length;
-  let cur = 0;
+// ── SCALE TO FILL VIEWPORT ──
+const W = 1440, H = 900;
+const scaler = document.getElementById('scaler');
+function rescale() {
+  const s = Math.min(window.innerWidth / W, window.innerHeight / H);
+  scaler.style.transform = 'scale(' + s + ')';
+}
+rescale();
+window.addEventListener('resize', rescale);
 
-  // ── SCALE TO FIT WINDOW ──
-  function resize() {
-    const scaleX = window.innerWidth  / 960;
-    const scaleY = window.innerHeight / 540;
-    const scale  = Math.min(scaleX, scaleY);
-    stage.style.transform = `scale(${scale})`;
-    stage.style.transformOrigin = 'center center';
-  }
-  window.addEventListener('resize', resize);
-  resize();
+// ── SLIDES ──
+const slides = document.querySelectorAll('.slide');
+const total = slides.length;
+let cur = 0;
 
-  // ── NAVIGATION ──
-  function goTo(n) {
-    slides[cur].classList.remove('active');
-    cur = Math.max(0, Math.min(total - 1, n));
-    slides[cur].classList.add('active');
-    update();
-  }
+const dotsEl = document.getElementById('dots');
+for (let i = 0; i < total; i++) {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i === 0 ? ' active' : '');
+  d.onclick = () => goTo(i);
+  dotsEl.appendChild(d);
+}
 
-  function update() {
-    slides.forEach(s => {
-      s.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('on', i === cur));
-      s.querySelector('.nav-ctr').textContent = (cur + 1) + ' / ' + total;
-      s.querySelector('.prev').disabled = cur === 0;
-      s.querySelector('.next').disabled = cur === total - 1;
-    });
-  }
+function goTo(idx) {
+  if (idx === cur) return;
+  slides[cur].classList.remove('active');
+  slides[cur].classList.add('exit');
+  const prev = cur;
+  setTimeout(() => slides[prev].classList.remove('exit'), 400);
+  cur = idx;
+  slides[cur].classList.add('active');
+  updateUI();
+}
 
-  slides.forEach(s => {
-    const dotsEl = s.querySelector('.nav-dots');
-    slides.forEach((_, i) => {
-      const d = document.createElement('button');
-      d.className = 'dot';
-      d.addEventListener('click', () => goTo(i));
-      dotsEl.appendChild(d);
-    });
-    s.querySelector('.prev').addEventListener('click', () => goTo(cur - 1));
-    s.querySelector('.next').addEventListener('click', () => goTo(cur + 1));
-  });
+function changeSlide(dir) {
+  const next = cur + dir;
+  if (next >= 0 && next < total) goTo(next);
+}
 
-  document.addEventListener('keydown', e => {
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goTo(cur + 1);
-    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   goTo(cur - 1);
-  });
+function updateUI() {
+  document.getElementById('progress').style.width = ((cur + 1) / total * 100) + '%';
+  document.getElementById('counter').textContent = (cur + 1) + ' / ' + total;
+  document.getElementById('btn-prev').disabled = cur === 0;
+  document.getElementById('btn-next').disabled = cur === total - 1;
+  document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === cur));
+}
 
-  update();
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); changeSlide(1); }
+  else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); changeSlide(-1); }
+});
+
+let tx = 0;
+document.addEventListener('touchstart', e => tx = e.touches[0].clientX);
+document.addEventListener('touchend', e => {
+  const dx = tx - e.changedTouches[0].clientX;
+  if (Math.abs(dx) > 50) changeSlide(dx > 0 ? 1 : -1);
+});
+
+updateUI();
 </script>
 </body>
 </html>
